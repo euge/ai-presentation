@@ -71,6 +71,7 @@
   .def-term{font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:.18em;text-transform:uppercase;color:var(--accent);margin-bottom:8px}
   .def-body{color:var(--ink);font-size:14px;line-height:1.6;opacity:.92}
   .def-body em{color:var(--accent);font-style:italic}
+  .def-svg{width:100%;max-width:820px}
   .tensor-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:14px;margin-bottom:20px}
   .tensor-card{background:#0b0d12;border:1px solid #242838;border-radius:10px;padding:12px 14px;overflow:hidden}
   .tensor-label{font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--accent);letter-spacing:.12em;margin-bottom:8px;text-transform:uppercase}
@@ -98,49 +99,64 @@
 
 <div class="stage">
   <div class="step-bar" id="stepBar">
-    <button class="active" data-step="1">01 · Basics</button>
-    <button data-step="2">02 · Pixels</button>
-    <button data-step="3">03 · Layout</button>
-    <button data-step="4">04 · Input</button>
-    <button data-step="5">05 · Hidden</button>
-    <button data-step="6">06 · Output</button>
-    <button data-step="7">07 · Weights = Knobs</button>
-    <button data-step="8">08 · Untrained</button>
-    <button data-step="9">09 · Training</button>
-    <button data-step="10">10 · Trained</button>
-    <button data-step="11">11 · The Secret Sauce</button>
+    <button class="active" data-step="1">01 · Network</button>
+    <button data-step="2">02 · Layer</button>
+    <button data-step="3">03 · Neuron</button>
+    <button data-step="4">04 · Weight</button>
+    <button data-step="5">05 · Fire Together</button>
+    <button data-step="6">06 · Pixels</button>
+    <button data-step="7">07 · Layout</button>
+    <button data-step="8">08 · Input</button>
+    <button data-step="9">09 · Hidden</button>
+    <button data-step="10">10 · Output</button>
+    <button data-step="11">11 · Weights = Knobs</button>
+    <button data-step="12">12 · Untrained</button>
+    <button data-step="13">13 · Training</button>
+    <button data-step="14">14 · Trained</button>
+    <button data-step="15">15 · The Secret Sauce</button>
   </div>
 
   <div class="step active" data-step="1">
-    <h2 class="step-title">First, the basics</h2>
-    <p class="step-desc">Before we trace a digit through the network, a few plain-English definitions — no math required.</p>
-    <div class="canvas-wrap" style="min-height:auto;padding:28px 24px;display:block">
-      <div class="defs">
-        <div class="def">
-          <div class="def-term">Neural network</div>
-          <div class="def-body">A stack of simple math functions arranged in layers. You feed numbers in one end (like the pixels of an image), the numbers flow through the layers, and an answer pops out the other end (like "this is a 3"). The network isn't <em>programmed</em> with rules — it's <em>trained</em> by showing it thousands of examples until it gets good at guessing.</div>
-        </div>
-        <div class="def">
-          <div class="def-term">Neuron</div>
-          <div class="def-body">A tiny unit that holds a single number between 0 and 1 — think of it as how "excited" or "lit up" it is. Each neuron looks at the neurons feeding into it, does a little weighted sum, and decides how excited <em>it</em> should be. Stack thousands of these together and you get surprisingly smart behavior.</div>
-        </div>
-        <div class="def">
-          <div class="def-term">Weight</div>
-          <div class="def-body">The strength of the connection between two neurons — like a volume knob. A big weight means "this input matters a lot to me." A near-zero weight means "ignore this one." <em>Training</em> is just the process of nudging millions of these knobs until the whole network behaves.</div>
-        </div>
-        <div class="def">
-          <div class="def-term">Layer</div>
-          <div class="def-body">A row of neurons that all do their work at the same time. Data flows layer by layer: pixels → hidden layer (which spots patterns like edges and curves) → output layer (which names the digit). Each layer builds on what the previous one found.</div>
-        </div>
-        <div class="def def-wide">
-          <div class="def-term">Borrowed from neuroscience: "neurons that fire together, wire together"</div>
-          <div class="def-body">Hebb's famous line about real brains: when two biological neurons activate at the same time, the connection between them strengthens. Artificial neural networks lean on the same idea in a <em>very</em> loose way — during training, connections that consistently help the network get the right answer grow stronger, while unhelpful ones shrink. The math is different from a real brain, but the intuition rhymes: <em>useful partnerships get reinforced.</em></div>
-        </div>
-      </div>
+    <h2 class="step-title">Neural network</h2>
+    <p class="step-desc">A stack of simple math steps that turns inputs into an answer — and gets better at it by seeing examples.</p>
+    <div class="canvas-wrap">
+      <svg viewBox="0 0 800 460" class="def-svg"><g class="def-diagram" data-mode="network"></g></svg>
     </div>
   </div>
 
   <div class="step" data-step="2">
+    <h2 class="step-title">Layer</h2>
+    <p class="step-desc">A column of neurons that all do their work at the same time before passing results to the next column.</p>
+    <div class="canvas-wrap">
+      <svg viewBox="0 0 800 460" class="def-svg"><g class="def-diagram" data-mode="layer"></g></svg>
+    </div>
+  </div>
+
+  <div class="step" data-step="3">
+    <h2 class="step-title">Neuron</h2>
+    <p class="step-desc">A single unit that holds one number — how "lit up" it is based on what feeds into it.</p>
+    <div class="canvas-wrap">
+      <svg viewBox="0 0 800 460" class="def-svg"><g class="def-diagram" data-mode="neuron"></g></svg>
+    </div>
+  </div>
+
+  <div class="step" data-step="4">
+    <h2 class="step-title">Weight</h2>
+    <p class="step-desc">A single connection between two neurons with a strength dial — the thing training actually adjusts.</p>
+    <div class="canvas-wrap">
+      <svg viewBox="0 0 800 460" class="def-svg"><g class="def-diagram" data-mode="weight"></g></svg>
+    </div>
+  </div>
+
+  <div class="step" data-step="5">
+    <h2 class="step-title">"Neurons that fire together, wire together"</h2>
+    <p class="step-desc">Connections on paths that consistently help the network get the right answer grow stronger; unhelpful ones fade.</p>
+    <div class="canvas-wrap">
+      <svg viewBox="0 0 800 460" class="def-svg"><g class="def-diagram" data-mode="fire"></g></svg>
+    </div>
+  </div>
+
+  <div class="step" data-step="6">
     <h2 class="step-title">The image is just a grid of numbers</h2>
     <p class="step-desc">A handwritten "3" is captured as a small grid of pixels. Each pixel has a brightness value between 0 (black) and 1 (white). The network never sees the picture — only these numbers.</p>
     <div class="canvas-wrap">
@@ -163,7 +179,7 @@
     </div>
   </div>
 
-  <div class="step" data-step="3">
+  <div class="step" data-step="7">
     <h2 class="step-title">The network's anatomy</h2>
     <p class="step-desc">Before we trace how data flows through it, here's the full layout — three layers of neurons connected by weights. Each circle is a neuron, each line is a connection. We'll walk through each piece next.</p>
     <div class="canvas-wrap">
@@ -186,7 +202,7 @@
     </div>
   </div>
 
-  <div class="step" data-step="4">
+  <div class="step" data-step="8">
     <h2 class="step-title">Each pixel becomes an input neuron</h2>
     <p class="step-desc">The flattened list of 64 brightness values is fed into 64 input neurons. Each input neuron simply holds one pixel's value. Think of this layer as the eyes of the network.</p>
     <div class="canvas-wrap">
@@ -201,7 +217,7 @@
     <div class="formula">input neuron <b>x<sub>i</sub></b> = pixel<sub>i</sub> brightness  ·  <b>i</b> = 1 to 64</div>
   </div>
 
-  <div class="step" data-step="5">
+  <div class="step" data-step="9">
     <h2 class="step-title">Hidden neurons: multiply, add, activate</h2>
     <p class="step-desc">Each connection has a <em>weight</em>. The hidden neuron multiplies each input by its weight, sums them up, then runs the total through ReLU — which simply outputs the number if it's positive, or zero if it's negative. Here's one hidden neuron with 3 inputs, worked out:</p>
     <div class="canvas-wrap">
@@ -287,7 +303,7 @@
     <div class="formula">h = ReLU( <b>w₁</b>·x₁ + <b>w₂</b>·x₂ + <b>w₃</b>·x₃ )  ·  ReLU keeps positive numbers, zeroes out negatives</div>
   </div>
 
-  <div class="step" data-step="6">
+  <div class="step" data-step="10">
     <h2 class="step-title">Output layer: same math, 10 times</h2>
     <p class="step-desc">Each output neuron does the exact same thing: multiply every hidden value by its weight, sum them up. Here are 3 hidden neurons feeding into the output neuron for digit "3". The output with the biggest number wins.</p>
     <div class="canvas-wrap">
@@ -372,7 +388,7 @@
     <div class="formula">output<sub>"3"</sub> = <b>w₁</b>·h₁ + <b>w₂</b>·h₂ + <b>w₃</b>·h₃  ·  the digit with the biggest score wins</div>
   </div>
 
-  <div class="step" data-step="8">
+  <div class="step" data-step="12">
     <h2 class="step-title">Before training: the network is just guessing</h2>
     <p class="step-desc">Fresh out of the box, every weight is <em>random</em>. The pixels still flow through, the math still runs — but the hidden layer isn't detecting anything meaningful yet, so the output is basically noise. Here the network looks at a "3" and confidently blurts out <em>"9"</em>. Wrong, but that's the whole point: it hasn't learned yet.</p>
     <div class="canvas-wrap">
@@ -395,7 +411,7 @@
     </div>
   </div>
 
-  <div class="step" data-step="10">
+  <div class="step" data-step="14">
     <h2 class="step-title">After training: the same network, now correct</h2>
     <p class="step-desc">Same architecture, same pixels, same forward pass — but now every weight has been nudged thousands of times toward getting things right. The hidden layer is tuned to pick up the curves and edges of real digits, and the output for <em>"3"</em> lights up the strongest. This is one full <em>forward pass</em>, post-training.</p>
     <div class="canvas-wrap">
@@ -418,7 +434,7 @@
     </div>
   </div>
 
-  <div class="step" data-step="7">
+  <div class="step" data-step="11">
     <h2 class="step-title">Each weight is a knob you can dial</h2>
     <p class="step-desc">Imagine just <em>one</em> hidden neuron with 4 inputs. Each connection has a weight — turn the knob up to amplify that input, down to suppress it (or even invert it). The neuron sums the dialed-up signals and fires through ReLU. <em>Drag the knobs up or down</em> to see how the output changes.</p>
     <div class="canvas-wrap" style="flex-direction:column;align-items:stretch;padding:20px">
@@ -432,7 +448,7 @@
     <div class="formula">h = ReLU( <b>w₁</b>·x₁ + <b>w₂</b>·x₂ + <b>w₃</b>·x₃ + <b>w₄</b>·x₄ )</div>
   </div>
 
-  <div class="step" data-step="9">
+  <div class="step" data-step="13">
     <h2 class="step-title">Training: tweak the knobs until it gets things right</h2>
     <p class="step-desc">We start with random weights — the network's guesses are nonsense. We show it labeled examples ("this image is a 3"), measure how wrong it was (the <em>loss</em>), and nudge every weight a tiny bit in the direction that reduces the error. Repeat thousands of times. Hit <em>auto-train</em> to watch.</p>
     <div class="canvas-wrap" style="flex-direction:column;align-items:stretch;padding:20px">
@@ -451,7 +467,7 @@
     <div class="formula">loss = how_wrong( prediction, true_label )  →  adjust every weight a tiny bit to reduce loss</div>
   </div>
 
-  <div class="step" data-step="11">
+  <div class="step" data-step="15">
     <h2 class="step-title">The secret sauce is just numbers</h2>
     <p class="step-desc">There's no magic inside a trained neural network — just <em>weights</em>, saved as giant tables of floating-point numbers. The architecture is a recipe; the weights are the actual knowledge. Copy those numbers to another machine and you've copied the entire trained model.</p>
     <div class="canvas-wrap" style="flex-direction:column;align-items:stretch;padding:22px 20px">
@@ -483,7 +499,7 @@
 
   <div class="controls">
     <button id="prev">← PREV</button>
-    <span class="counter" id="counter">STEP 01 / 11</span>
+    <span class="counter" id="counter">STEP 01 / 15</span>
     <button id="next">NEXT →</button>
   </div>
 </div>
@@ -554,6 +570,107 @@ positions.forEach((y,i) => {
 
 // STEP 3 and STEP 4 are now hardcoded inline SVG with worked-math examples
 // (no dynamic JS needed for those steps)
+
+// STEPS 1-5: DEFINITION DIAGRAMS (same network shape, different annotation)
+function renderDefDiagram(g, mode) {
+  const inX = 200, hidX = 430, outX = 660;
+  const inYs = [];
+  for (let i=0;i<10;i++) inYs.push(80+i*32);
+  const inLabels = ['x₁','x₂','x₃','x₄','⋮','⋮','x₆₁','x₆₂','x₆₃','x₆₄'];
+  const hidYs = [];
+  for (let i=0;i<8;i++) hidYs.push(100+i*36);
+  const outYs = [];
+  for (let i=0;i<10;i++) outYs.push(80+i*32);
+
+  // Highlight selections per mode
+  const highlightNeuron = { col: 'hidden', idx: 3 };         // one hidden neuron
+  const highlightWeight = { fromIdx: 2, toIdx: 3 };          // one input→hidden line
+  const firePath = { inputs: [1,2,6,8], hidden: [1,3,6], output: 3 };
+
+  // Glow backdrop for "network" mode
+  if (mode === 'network') {
+    g.innerHTML += `<rect x="150" y="40" width="560" height="380" rx="18" fill="none" stroke="#ffb547" stroke-width="2" stroke-dasharray="6,5" opacity=".7"/>`;
+    g.innerHTML += `<text x="430" y="30" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="11" fill="#ffb547" letter-spacing="3">THE WHOLE THING = A NEURAL NETWORK</text>`;
+  }
+
+  // Layer highlights (columns)
+  if (mode === 'layer') {
+    [['input',160,50,80],['hidden',390,70,80],['output',620,50,80]].forEach(([name,x,y,w]) => {
+      g.innerHTML += `<rect x="${x}" y="${y}" width="${w}" height="330" rx="10" fill="rgba(95,179,255,.05)" stroke="#5fb3ff" stroke-width="1.5" stroke-dasharray="4,4"/>`;
+    });
+    g.innerHTML += `<text x="200" y="45" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="10" fill="#5fb3ff" letter-spacing="2">INPUT LAYER</text>`;
+    g.innerHTML += `<text x="430" y="62" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="10" fill="#5fb3ff" letter-spacing="2">HIDDEN LAYER</text>`;
+    g.innerHTML += `<text x="660" y="45" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="10" fill="#5fb3ff" letter-spacing="2">OUTPUT LAYER</text>`;
+    g.innerHTML += `<text x="430" y="440" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="11" fill="#7a8195">three layers — data flows left → right</text>`;
+  }
+
+  // Connections (muted by default; highlighted subset for weight / fire modes)
+  inYs.forEach((iy,i) => {
+    if (inLabels[i]==='⋮') return;
+    hidYs.forEach((hy,j) => {
+      let stroke = '#3a4258', sw = '.5', op = '.35';
+      if (mode === 'weight' && i === highlightWeight.fromIdx && j === highlightWeight.toIdx) {
+        stroke = '#ffb547'; sw = '2.5'; op = '1';
+      }
+      if (mode === 'fire' && firePath.inputs.includes(i) && firePath.hidden.includes(j)) {
+        stroke = '#ffb547'; sw = '1.8'; op = '.85';
+      }
+      g.innerHTML += `<line x1="${inX+12}" y1="${iy}" x2="${hidX-12}" y2="${hy}" stroke="${stroke}" stroke-width="${sw}" opacity="${op}"/>`;
+    });
+  });
+  hidYs.forEach((hy,j) => outYs.forEach((oy,k) => {
+    let stroke = '#3a4258', sw = '.5', op = '.35';
+    if (mode === 'fire' && firePath.hidden.includes(j) && k === firePath.output) {
+      stroke = '#ffb547'; sw = '1.8'; op = '.85';
+    }
+    g.innerHTML += `<line x1="${hidX+12}" y1="${hy}" x2="${outX-12}" y2="${oy}" stroke="${stroke}" stroke-width="${sw}" opacity="${op}"/>`;
+  }));
+
+  // Neurons
+  inYs.forEach((y,i) => {
+    if (inLabels[i]==='⋮') {
+      g.innerHTML += `<text x="${inX}" y="${y+4}" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="14" fill="#7a8195">⋮</text>`;
+    } else {
+      const lit = mode === 'fire' && firePath.inputs.includes(i);
+      g.innerHTML += `<circle cx="${inX}" cy="${y}" r="10" fill="${lit?'#ffb547':'#1c2030'}" stroke="${lit?'#ffb547':'#5fb3ff'}" stroke-width="1.5"/>`;
+    }
+  });
+  hidYs.forEach((y,j) => {
+    const lit = mode === 'fire' && firePath.hidden.includes(j);
+    const isNeuronPick = mode === 'neuron' && j === highlightNeuron.idx;
+    const r = isNeuronPick ? 16 : 11;
+    const fill = (lit || isNeuronPick) ? '#ffb547' : '#1c2030';
+    const stroke = (lit || isNeuronPick) ? '#ffb547' : '#5fb3ff';
+    g.innerHTML += `<circle cx="${hidX}" cy="${y}" r="${r}" fill="${fill}" stroke="${stroke}" stroke-width="${isNeuronPick?2.5:1.5}"/>`;
+  });
+  outYs.forEach((y,k) => {
+    const lit = mode === 'fire' && k === firePath.output;
+    g.innerHTML += `<circle cx="${outX}" cy="${y}" r="${lit?13:10}" fill="${lit?'#ffb547':'#1c2030'}" stroke="${lit?'#ffb547':'#5fb3ff'}" stroke-width="1.5"/>`;
+  });
+
+  // Mode-specific callouts
+  if (mode === 'neuron') {
+    const ny = hidYs[highlightNeuron.idx];
+    g.innerHTML += `<line x1="${hidX+20}" y1="${ny}" x2="${hidX+90}" y2="${ny-50}" stroke="#ffb547" stroke-width="1.2"/>`;
+    g.innerHTML += `<rect x="${hidX+90}" y="${ny-72}" width="170" height="44" rx="8" fill="#0b0d12" stroke="#ffb547" stroke-width="1.2"/>`;
+    g.innerHTML += `<text x="${hidX+175}" y="${ny-54}" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="10" fill="#ffb547" letter-spacing="2">ONE NEURON</text>`;
+    g.innerHTML += `<text x="${hidX+175}" y="${ny-38}" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="10" fill="#7a8195">holds one number, 0–1</text>`;
+  }
+  if (mode === 'weight') {
+    const iy = inYs[highlightWeight.fromIdx], hy = hidYs[highlightWeight.toIdx];
+    const mx = (inX+hidX)/2, my = (iy+hy)/2;
+    g.innerHTML += `<circle cx="${mx}" cy="${my}" r="16" fill="#0b0d12" stroke="#ffb547" stroke-width="1.5"/>`;
+    g.innerHTML += `<text x="${mx}" y="${my+3}" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="10" fill="#ffb547" font-weight="600">w</text>`;
+    g.innerHTML += `<line x1="${mx+16}" y1="${my}" x2="${mx+100}" y2="${my-40}" stroke="#ffb547" stroke-width="1.2"/>`;
+    g.innerHTML += `<rect x="${mx+100}" y="${my-62}" width="190" height="44" rx="8" fill="#0b0d12" stroke="#ffb547" stroke-width="1.2"/>`;
+    g.innerHTML += `<text x="${mx+195}" y="${my-44}" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="10" fill="#ffb547" letter-spacing="2">ONE WEIGHT</text>`;
+    g.innerHTML += `<text x="${mx+195}" y="${my-28}" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="10" fill="#7a8195">a strength dial on a connection</text>`;
+  }
+  if (mode === 'fire') {
+    g.innerHTML += `<text x="430" y="440" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="11" fill="#ffb547" letter-spacing="2">the path that gets the right answer → gets reinforced</text>`;
+  }
+}
+document.querySelectorAll('.def-diagram').forEach(g => renderDefDiagram(g, g.dataset.mode));
 
 // STEP 2: LAYOUT (neutral anatomy view, no activations)
 const layoutInput = document.getElementById('layoutInput');
@@ -904,7 +1021,7 @@ const steps = document.querySelectorAll('.step');
 const stepBtns = document.querySelectorAll('#stepBar button');
 const counter = document.getElementById('counter');
 let current = 1;
-const TOTAL = 11;
+const TOTAL = 15;
 function goto(n) {
   current = Math.max(1, Math.min(TOTAL, n));
   steps.forEach(s => s.classList.toggle('active', +s.dataset.step === current));
