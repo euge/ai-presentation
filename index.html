@@ -25,7 +25,9 @@
   h1 em{font-style:italic;color:var(--accent)}
   .sub{color:var(--muted);max-width:700px;font-size:15px;line-height:1.5}
   .stage{max-width:1100px;margin:0 auto;background:var(--panel);border:1px solid #232735;border-radius:18px;padding:24px;box-shadow:0 30px 80px -30px rgba(0,0,0,.6)}
-  .step-bar{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:20px;border-bottom:1px solid #242838;padding-bottom:16px}
+  .step-bar{display:flex;flex-direction:column;gap:8px;margin-bottom:20px;border-bottom:1px solid #242838;padding-bottom:16px}
+  .phase-row{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+  .phase-label{font-family:'JetBrains Mono',monospace;font-size:9px;color:var(--accent);letter-spacing:.28em;text-transform:uppercase;min-width:110px;opacity:.75}
   .step-bar button{background:transparent;color:var(--muted);border:1px solid #2a2f40;border-radius:999px;padding:7px 12px;font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:.12em;text-transform:uppercase;cursor:pointer;transition:.2s}
   .step-bar button:hover{color:var(--ink);border-color:#3a4258}
   .step-bar button.active{background:var(--accent);color:#1a1408;border-color:var(--accent);font-weight:600}
@@ -99,66 +101,102 @@
 
 <div class="stage">
   <div class="step-bar" id="stepBar">
-    <button class="active" data-step="1">01 · Network</button>
-    <button data-step="2">02 · Layer</button>
-    <button data-step="3">03 · Neuron</button>
-    <button data-step="4">04 · Weight</button>
-    <button data-step="5">05 · Fire Together</button>
-    <button data-step="6">06 · Pixels</button>
-    <button data-step="7">07 · Layout</button>
-    <button data-step="8">08 · Input</button>
-    <button data-step="9">09 · Hidden</button>
-    <button data-step="10">10 · Output</button>
-    <button data-step="11">11 · Weights = Knobs</button>
-    <button data-step="12">12 · Untrained</button>
-    <button data-step="13">13 · Training</button>
-    <button data-step="14">14 · Trained</button>
-    <button data-step="15">15 · The Secret Sauce</button>
+    <div class="phase-row">
+      <span class="phase-label">Setup</span>
+      <button class="active" data-step="1">01 · Problem</button>
+      <button data-step="2">02 · Pixels</button>
+      <button data-step="3">03 · Anatomy</button>
+    </div>
+    <div class="phase-row">
+      <span class="phase-label">Parts</span>
+      <button data-step="4">04 · Network</button>
+      <button data-step="5">05 · Layer</button>
+      <button data-step="6">06 · Neuron</button>
+      <button data-step="7">07 · Weight</button>
+      <button data-step="8">08 · Knobs</button>
+      <button data-step="9">09 · Analogy</button>
+    </div>
+    <div class="phase-row">
+      <span class="phase-label">Forward Pass</span>
+      <button data-step="10">10 · Input</button>
+      <button data-step="11">11 · Hidden</button>
+      <button data-step="12">12 · Output</button>
+    </div>
+    <div class="phase-row">
+      <span class="phase-label">Learning</span>
+      <button data-step="13">13 · Random</button>
+      <button data-step="14">14 · Fire Together</button>
+      <button data-step="15">15 · Training</button>
+      <button data-step="16">16 · Trained</button>
+      <button data-step="17">17 · Weights</button>
+      <button data-step="18">18 · Takeaway</button>
+    </div>
   </div>
 
   <div class="step active" data-step="1">
+    <h2 class="step-title">A computer has to read this <em>3</em></h2>
+    <p class="step-desc">Banks read handwritten checks. The post office sorts mail by ZIP code. Your school scans thousands of bubble-test answers. Every day, computers turn a messy smear of ink into the right digit. <em>How?</em> By the end of these slides you'll know — and you'll see the math is simpler than it looks.</p>
+    <div class="canvas-wrap">
+      <svg viewBox="0 0 800 380">
+        <g id="hookDigits"></g>
+        <g transform="translate(520,170)">
+          <line x1="0" y1="0" x2="70" y2="0" stroke="#5fb3ff" stroke-width="2"/>
+          <polygon points="70,-7 84,0 70,7" fill="#5fb3ff"/>
+          <text x="42" y="-14" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="11" fill="#7a8195" letter-spacing="2">A MACHINE</text>
+        </g>
+        <g transform="translate(640,130)">
+          <rect x="0" y="0" width="120" height="80" rx="12" fill="#0b0d12" stroke="#ffb547" stroke-width="2" stroke-dasharray="6,4"/>
+          <text x="60" y="50" text-anchor="middle" font-family="Fraunces,serif" font-size="42" fill="#ffb547" font-weight="800">?</text>
+        </g>
+        <text x="180" y="360" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="11" fill="#7a8195">PIXELS FROM A CAMERA OR SCAN</text>
+        <text x="700" y="360" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="11" fill="#7a8195">THE RIGHT ANSWER</text>
+      </svg>
+    </div>
+  </div>
+
+  <div class="step" data-step="4">
     <h2 class="step-title">Neural network</h2>
-    <p class="step-desc">A stack of simple math steps that turns inputs into an answer — and gets better at it by seeing examples.</p>
+    <p class="step-desc">A stack of simple math steps that turns inputs into an answer — and gets better at it by seeing examples. The whole thing is just dots (neurons) wired together by lines (weights), arranged in columns (layers).</p>
     <div class="canvas-wrap">
       <svg viewBox="0 0 800 460" class="def-svg"><g class="def-diagram" data-mode="network"></g></svg>
     </div>
   </div>
 
-  <div class="step" data-step="2">
+  <div class="step" data-step="5">
     <h2 class="step-title">Layer</h2>
-    <p class="step-desc">A column of neurons that all do their work at the same time before passing results to the next column.</p>
+    <p class="step-desc">A column of neurons that all do their work at the same time before passing results to the next column. Data flows left → right.</p>
     <div class="canvas-wrap">
       <svg viewBox="0 0 800 460" class="def-svg"><g class="def-diagram" data-mode="layer"></g></svg>
     </div>
   </div>
 
-  <div class="step" data-step="3">
+  <div class="step" data-step="6">
     <h2 class="step-title">Neuron</h2>
-    <p class="step-desc">A single unit that holds one number — how "lit up" it is based on what feeds into it.</p>
+    <p class="step-desc">A single unit that holds one number — how "lit up" it is based on what feeds into it. Think of it as a lightbulb that can be anywhere from off (0) to fully bright (1).</p>
     <div class="canvas-wrap">
       <svg viewBox="0 0 800 460" class="def-svg"><g class="def-diagram" data-mode="neuron"></g></svg>
     </div>
   </div>
 
-  <div class="step" data-step="4">
+  <div class="step" data-step="7">
     <h2 class="step-title">Weight</h2>
-    <p class="step-desc">A single connection between two neurons with a strength dial — the thing training actually adjusts.</p>
+    <p class="step-desc">A single connection between two neurons with a strength dial. Turn it up: that input has a louder say. Turn it down (or negative): it's suppressed or inverted. Training is the process of nudging every one of these dials.</p>
     <div class="canvas-wrap">
       <svg viewBox="0 0 800 460" class="def-svg"><g class="def-diagram" data-mode="weight"></g></svg>
     </div>
   </div>
 
-  <div class="step" data-step="5">
+  <div class="step" data-step="14">
     <h2 class="step-title">"Neurons that fire together, wire together"</h2>
-    <p class="step-desc">Connections on paths that consistently help the network get the right answer grow stronger; unhelpful ones fade.</p>
+    <p class="step-desc">Connections on paths that consistently help the network get the right answer grow stronger; unhelpful ones fade. This is the intuition behind training — you'll see it happen in the next slide. <em>(Caveat for the curious: real networks learn via "backpropagation," a different mechanism. But this mental model gets you 90% of the way.)</em></p>
     <div class="canvas-wrap">
       <svg viewBox="0 0 800 460" class="def-svg"><g class="def-diagram" data-mode="fire"></g></svg>
     </div>
   </div>
 
-  <div class="step" data-step="6">
+  <div class="step" data-step="2">
     <h2 class="step-title">The image is just a grid of numbers</h2>
-    <p class="step-desc">A handwritten "3" is captured as a small grid of pixels. Each pixel has a brightness value between 0 (black) and 1 (white). The network never sees the picture — only these numbers.</p>
+    <p class="step-desc">A handwritten "3" is captured as a small grid of pixels. Each pixel has a brightness value between 0 (black) and 1 (white). The network never sees the picture — only these numbers. Our whole job is to turn these 64 numbers into one answer: "it's a 3."</p>
     <div class="canvas-wrap">
       <svg viewBox="0 0 700 380">
         <g id="pixelGrid"></g>
@@ -179,9 +217,9 @@
     </div>
   </div>
 
-  <div class="step" data-step="7">
-    <h2 class="step-title">The network's anatomy</h2>
-    <p class="step-desc">Before we trace how data flows through it, here's the full layout — three layers of neurons connected by weights. Each circle is a neuron, each line is a connection. We'll walk through each piece next.</p>
+  <div class="step" data-step="3">
+    <h2 class="step-title">The whole machine, at a glance</h2>
+    <p class="step-desc">Here's the full layout — three columns of neurons (circles) connected by weights (lines). The left column holds the 64 pixels, the right column has one neuron per digit (0–9). The middle is where the work happens. Don't worry about the details yet — we'll unpack each piece.</p>
     <div class="canvas-wrap">
       <svg viewBox="0 0 800 460">
         <g id="layoutConnIH"></g>
@@ -202,9 +240,9 @@
     </div>
   </div>
 
-  <div class="step" data-step="8">
+  <div class="step" data-step="10">
     <h2 class="step-title">Each pixel becomes an input neuron</h2>
-    <p class="step-desc">The flattened list of 64 brightness values is fed into 64 input neurons. Each input neuron simply holds one pixel's value. Think of this layer as the eyes of the network.</p>
+    <p class="step-desc">The flattened list of 64 brightness values is fed into 64 input neurons. Each input neuron simply holds one pixel's value. Think of this layer as the eyes of the network. <em>(The subscript "x₁" just means "the first input" — nothing fancy.)</em></p>
     <div class="canvas-wrap">
       <svg viewBox="0 0 700 380">
         <g id="pixelGrid2"></g>
@@ -217,9 +255,9 @@
     <div class="formula">input neuron <b>x<sub>i</sub></b> = pixel<sub>i</sub> brightness  ·  <b>i</b> = 1 to 64</div>
   </div>
 
-  <div class="step" data-step="9">
-    <h2 class="step-title">Hidden neurons: multiply, add, activate</h2>
-    <p class="step-desc">Each connection has a <em>weight</em>. The hidden neuron multiplies each input by its weight, sums them up, then runs the total through ReLU — which simply outputs the number if it's positive, or zero if it's negative. Here's one hidden neuron with 3 inputs, worked out:</p>
+  <div class="step" data-step="11">
+    <h2 class="step-title">Hidden neurons: multiply, add, gate</h2>
+    <p class="step-desc">Each connection has a <em>weight</em>. The hidden neuron does three things: <em>(1)</em> multiply each input by its weight, <em>(2)</em> add the results, <em>(3)</em> pass the total through a <em>gate</em> that keeps positives and zeroes out negatives. That's it. Here's one hidden neuron with 3 inputs, worked out (real neurons have 64 inputs — we're showing 3 for clarity):</p>
     <div class="canvas-wrap">
       <svg viewBox="0 0 720 380">
         <!-- Input neurons -->
@@ -228,8 +266,8 @@
           <text x="120" y="95" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="14" fill="#1a1408" font-weight="600">1</text>
           <text x="80" y="95" text-anchor="end" font-family="JetBrains Mono,monospace" font-size="12" fill="#7a8195">x₁ =</text>
 
-          <circle cx="120" cy="190" r="22" fill="#1c2030" stroke="#5fb3ff" stroke-width="2"/>
-          <text x="120" y="195" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="14" fill="#7a8195">0</text>
+          <circle cx="120" cy="190" r="22" fill="#d29a3e" stroke="#d29a3e" stroke-width="2"/>
+          <text x="120" y="195" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="14" fill="#1a1408" font-weight="600">0.8</text>
           <text x="80" y="195" text-anchor="end" font-family="JetBrains Mono,monospace" font-size="12" fill="#7a8195">x₂ =</text>
 
           <circle cx="120" cy="290" r="22" fill="#ffb547" stroke="#ffb547" stroke-width="2"/>
@@ -239,23 +277,23 @@
 
         <!-- Weight connections with knobs -->
         <g>
-          <!-- w1 = 0.3 -->
-          <line x1="142" y1="90" x2="398" y2="188" stroke="#5fb3ff" stroke-width="2" opacity=".7"/>
+          <!-- w1 = 0.6 (positive) -->
+          <line x1="142" y1="90" x2="398" y2="188" stroke="#5fb3ff" stroke-width="2.5" opacity=".75"/>
           <circle cx="270" cy="139" r="18" fill="#0b0d12" stroke="#5fb3ff" stroke-width="1.5"/>
-          <line x1="270" y1="127" x2="270" y2="135" stroke="#ffb547" stroke-width="2.5"/>
-          <text x="270" y="143" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="10" fill="#5fb3ff" font-weight="600">.30</text>
+          <line x1="270" y1="127" x2="272" y2="134" stroke="#ffb547" stroke-width="2.5"/>
+          <text x="270" y="143" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="10" fill="#5fb3ff" font-weight="600">.60</text>
 
-          <!-- w2 = 0.4 -->
-          <line x1="142" y1="190" x2="398" y2="200" stroke="#5fb3ff" stroke-width="2" opacity=".7"/>
-          <circle cx="270" cy="195" r="18" fill="#0b0d12" stroke="#5fb3ff" stroke-width="1.5"/>
-          <line x1="270" y1="183" x2="272" y2="192" stroke="#ffb547" stroke-width="2.5"/>
-          <text x="270" y="199" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="10" fill="#5fb3ff" font-weight="600">.40</text>
+          <!-- w2 = -0.50 (NEGATIVE → pink/red line) -->
+          <line x1="142" y1="190" x2="398" y2="200" stroke="#ff5b6e" stroke-width="2" opacity=".75"/>
+          <circle cx="270" cy="195" r="18" fill="#0b0d12" stroke="#ff5b6e" stroke-width="1.5"/>
+          <line x1="270" y1="183" x2="264" y2="192" stroke="#ffb547" stroke-width="2.5"/>
+          <text x="270" y="199" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="10" fill="#ff5b6e" font-weight="600">-.50</text>
 
-          <!-- w3 = 0.45 -->
+          <!-- w3 = 0.40 (positive) -->
           <line x1="142" y1="290" x2="398" y2="212" stroke="#5fb3ff" stroke-width="2" opacity=".7"/>
           <circle cx="270" cy="251" r="18" fill="#0b0d12" stroke="#5fb3ff" stroke-width="1.5"/>
-          <line x1="270" y1="239" x2="274" y2="248" stroke="#ffb547" stroke-width="2.5"/>
-          <text x="270" y="255" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="10" fill="#5fb3ff" font-weight="600">.45</text>
+          <line x1="270" y1="239" x2="273" y2="248" stroke="#ffb547" stroke-width="2.5"/>
+          <text x="270" y="255" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="10" fill="#5fb3ff" font-weight="600">.40</text>
 
           <text x="270" y="40" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="10" fill="#7a8195" letter-spacing="2">WEIGHTS (knobs)</text>
         </g>
@@ -272,25 +310,25 @@
           <rect x="0" y="0" width="230" height="260" rx="10" fill="#0b0d12" stroke="#2a3045"/>
           <text x="115" y="22" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="9" fill="#ffb547" letter-spacing="2">STEP BY STEP</text>
 
-          <text x="18" y="55" font-family="JetBrains Mono,monospace" font-size="13" fill="#e9ecf1">1 × .30 = </text>
-          <text x="195" y="55" text-anchor="end" font-family="JetBrains Mono,monospace" font-size="13" fill="#ffb547" font-weight="600">0.30</text>
+          <text x="18" y="55" font-family="JetBrains Mono,monospace" font-size="13" fill="#e9ecf1">1 × .60 = </text>
+          <text x="195" y="55" text-anchor="end" font-family="JetBrains Mono,monospace" font-size="13" fill="#ffb547" font-weight="600">0.60</text>
 
-          <text x="18" y="82" font-family="JetBrains Mono,monospace" font-size="13" fill="#e9ecf1">0 × .40 = </text>
-          <text x="195" y="82" text-anchor="end" font-family="JetBrains Mono,monospace" font-size="13" fill="#ffb547" font-weight="600">0.00</text>
+          <text x="18" y="82" font-family="JetBrains Mono,monospace" font-size="13" fill="#e9ecf1">0.8 × -.50 = </text>
+          <text x="195" y="82" text-anchor="end" font-family="JetBrains Mono,monospace" font-size="13" fill="#ff5b6e" font-weight="600">-0.40</text>
 
-          <text x="18" y="109" font-family="JetBrains Mono,monospace" font-size="13" fill="#e9ecf1">1 × .45 = </text>
-          <text x="195" y="109" text-anchor="end" font-family="JetBrains Mono,monospace" font-size="13" fill="#ffb547" font-weight="600">0.45</text>
+          <text x="18" y="109" font-family="JetBrains Mono,monospace" font-size="13" fill="#e9ecf1">1 × .40 = </text>
+          <text x="195" y="109" text-anchor="end" font-family="JetBrains Mono,monospace" font-size="13" fill="#ffb547" font-weight="600">0.40</text>
 
           <line x1="18" y1="125" x2="210" y2="125" stroke="#2a3045" stroke-width="1"/>
 
           <text x="18" y="148" font-family="JetBrains Mono,monospace" font-size="13" fill="#7a8195">sum =</text>
-          <text x="195" y="148" text-anchor="end" font-family="JetBrains Mono,monospace" font-size="14" fill="#5fb3ff" font-weight="600">0.75</text>
+          <text x="195" y="148" text-anchor="end" font-family="JetBrains Mono,monospace" font-size="14" fill="#5fb3ff" font-weight="600">0.60</text>
 
-          <text x="18" y="180" font-family="JetBrains Mono,monospace" font-size="13" fill="#7a8195">ReLU(0.75) =</text>
+          <text x="18" y="180" font-family="JetBrains Mono,monospace" font-size="12" fill="#7a8195">gate(0.60) = positive, passes</text>
 
           <rect x="18" y="195" width="192" height="48" rx="6" fill="#1c2030" stroke="#5fffa0" stroke-width="1.5"/>
           <text x="114" y="218" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="10" fill="#5fffa0" letter-spacing="2">h FIRES →</text>
-          <text x="114" y="238" text-anchor="middle" font-family="Fraunces,serif" font-size="20" fill="#5fffa0" font-weight="700">0.75</text>
+          <text x="114" y="238" text-anchor="middle" font-family="Fraunces,serif" font-size="20" fill="#5fffa0" font-weight="700">0.60</text>
         </g>
 
         <!-- Arrow -->
@@ -300,12 +338,12 @@
         </g>
       </svg>
     </div>
-    <div class="formula">h = ReLU( <b>w₁</b>·x₁ + <b>w₂</b>·x₂ + <b>w₃</b>·x₃ )  ·  ReLU keeps positive numbers, zeroes out negatives</div>
+    <div class="formula">h = gate( <b>w₁</b>·x₁ + <b>w₂</b>·x₂ + <b>w₃</b>·x₃ )  ·  gate keeps positive sums, zeros out negative ones  ·  <span style="color:#7a8195">(engineers call this "ReLU")</span></div>
   </div>
 
-  <div class="step" data-step="10">
+  <div class="step" data-step="12">
     <h2 class="step-title">Output layer: same math, 10 times</h2>
-    <p class="step-desc">Each output neuron does the exact same thing: multiply every hidden value by its weight, sum them up. Here are 3 hidden neurons feeding into the output neuron for digit "3". The output with the biggest number wins.</p>
+    <p class="step-desc">Each output neuron does the exact same thing: multiply every hidden value by its weight, sum them up. There are 10 output neurons — one for each digit 0 through 9. Whichever one ends up with the biggest score wins, and that's the network's guess. Here are 3 of 16 hidden neurons feeding into the output for digit "3".</p>
     <div class="canvas-wrap">
       <svg viewBox="0 0 720 380">
         <!-- Hidden neurons (results from step 3) -->
@@ -388,9 +426,9 @@
     <div class="formula">output<sub>"3"</sub> = <b>w₁</b>·h₁ + <b>w₂</b>·h₂ + <b>w₃</b>·h₃  ·  the digit with the biggest score wins</div>
   </div>
 
-  <div class="step" data-step="12">
+  <div class="step" data-step="13">
     <h2 class="step-title">Before training: the network is just guessing</h2>
-    <p class="step-desc">Fresh out of the box, every weight is <em>random</em>. The pixels still flow through, the math still runs — but the hidden layer isn't detecting anything meaningful yet, so the output is basically noise. Here the network looks at a "3" and confidently blurts out <em>"9"</em>. Wrong, but that's the whole point: it hasn't learned yet.</p>
+    <p class="step-desc"><em>Same network, random weights.</em> Fresh out of the box, every weight is set to a random value. The pixels still flow through, the math still runs — but the hidden layer isn't detecting anything meaningful yet, so the output is basically noise. Here the network looks at a "3" and confidently blurts out <em>"9"</em>. Wrong, but that's the whole point: it hasn't learned yet. <em>(Remember this — we'll show the <strong>exact same network, same image</strong> after training.)</em></p>
     <div class="canvas-wrap">
       <svg viewBox="0 0 800 460">
         <g id="fullConnIHa"></g>
@@ -411,9 +449,9 @@
     </div>
   </div>
 
-  <div class="step" data-step="14">
+  <div class="step" data-step="16">
     <h2 class="step-title">After training: the same network, now correct</h2>
-    <p class="step-desc">Same architecture, same pixels, same forward pass — but now every weight has been nudged thousands of times toward getting things right. The hidden layer is tuned to pick up the curves and edges of real digits, and the output for <em>"3"</em> lights up the strongest. This is one full <em>forward pass</em>, post-training.</p>
+    <p class="step-desc"><em>Same network. Same image. Only the weights changed.</em> Every weight has been nudged thousands of times toward getting things right. The hidden layer is now tuned to pick up curves and edges, and the output for <em>"3"</em> lights up strongest. Compare this side-by-side with the previous slide — the circles and lines are identical. The <em>numbers</em> on the lines are what the network learned.</p>
     <div class="canvas-wrap">
       <svg viewBox="0 0 800 460">
         <g id="fullConnIH"></g>
@@ -434,9 +472,9 @@
     </div>
   </div>
 
-  <div class="step" data-step="11">
-    <h2 class="step-title">Each weight is a knob you can dial</h2>
-    <p class="step-desc">Imagine just <em>one</em> hidden neuron with 4 inputs. Each connection has a weight — turn the knob up to amplify that input, down to suppress it (or even invert it). The neuron sums the dialed-up signals and fires through ReLU. <em>Drag the knobs up or down</em> to see how the output changes.</p>
+  <div class="step" data-step="8">
+    <h2 class="step-title">Play with the knobs</h2>
+    <p class="step-desc">Enough definitions — here's a real weight you can touch. Imagine just <em>one</em> neuron with 4 inputs. Each connection has a weight dial: turn it up to amplify that input, down to suppress it, negative to invert it. Drag the dials and watch the output change. <em>Multiply that intuition by a million connections and you have a neural network.</em></p>
     <div class="canvas-wrap" style="flex-direction:column;align-items:stretch;padding:20px">
       <svg viewBox="0 0 700 240" style="margin-bottom:10px">
         <g id="knobNetwork"></g>
@@ -445,12 +483,117 @@
       <div class="knob-hint">↑ drag up to increase  ·  ↓ drag down to decrease</div>
       <div class="knob-output" id="knobOutput"></div>
     </div>
-    <div class="formula">h = ReLU( <b>w₁</b>·x₁ + <b>w₂</b>·x₂ + <b>w₃</b>·x₃ + <b>w₄</b>·x₄ )</div>
+    <div class="formula">output = gate( <b>w₁</b>·x₁ + <b>w₂</b>·x₂ + <b>w₃</b>·x₃ + <b>w₄</b>·x₄ )</div>
   </div>
 
-  <div class="step" data-step="13">
+  <div class="step" data-step="9">
+    <h2 class="step-title">Think lightbulbs and volume knobs</h2>
+    <p class="step-desc">Before we watch data flow through the network, hold two pictures in your head: every <em>neuron</em> is a lightbulb — it glows brighter when its inputs are bright. Every <em>weight</em> is a volume knob on one wire between two bulbs — turn it up and that input has a louder say, turn it negative and it pushes back. Training is just turning thousands of volume knobs until the right bulb lights up for each digit.</p>
+    <div class="canvas-wrap">
+      <svg viewBox="0 0 800 380">
+        <!-- Left: neuron = lightbulb analogy -->
+        <g transform="translate(50, 40)">
+          <text x="150" y="0" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="10" fill="#ffb547" letter-spacing="3">NEURON = LIGHTBULB</text>
+          <!-- Off bulb -->
+          <g transform="translate(50, 50)">
+            <circle cx="0" cy="0" r="28" fill="#1c2030" stroke="#3a4258" stroke-width="1.5"/>
+            <path d="M -6 12 L -6 18 L 6 18 L 6 12" stroke="#3a4258" stroke-width="2" fill="none"/>
+            <text x="0" y="55" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="11" fill="#7a8195">value = 0</text>
+            <text x="0" y="70" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="9" fill="#7a8195">(off)</text>
+          </g>
+          <!-- Dim bulb -->
+          <g transform="translate(150, 50)">
+            <circle cx="0" cy="0" r="28" fill="#6b5a3a" stroke="#8a7a4a" stroke-width="1.5" opacity=".85"/>
+            <path d="M -6 12 L -6 18 L 6 18 L 6 12" stroke="#3a4258" stroke-width="2" fill="none"/>
+            <text x="0" y="55" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="11" fill="#7a8195">value = 0.4</text>
+            <text x="0" y="70" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="9" fill="#7a8195">(dim)</text>
+          </g>
+          <!-- Bright bulb -->
+          <g transform="translate(250, 50)">
+            <circle cx="0" cy="0" r="30" fill="#ffb547" stroke="#ffb547" stroke-width="2"/>
+            <circle cx="0" cy="0" r="38" fill="#ffb547" opacity=".15"/>
+            <path d="M -6 14 L -6 20 L 6 20 L 6 14" stroke="#3a4258" stroke-width="2" fill="none"/>
+            <text x="0" y="55" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="11" fill="#7a8195">value = 1.0</text>
+            <text x="0" y="70" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="9" fill="#7a8195">(bright)</text>
+          </g>
+        </g>
+
+        <!-- Right: weight = volume knob analogy -->
+        <g transform="translate(450, 40)">
+          <text x="150" y="0" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="10" fill="#ffb547" letter-spacing="3">WEIGHT = VOLUME KNOB</text>
+          <!-- Down knob -->
+          <g transform="translate(40, 50)">
+            <circle cx="0" cy="0" r="26" fill="radial-gradient(#2a3045,#0b0d12)" fill="#1c2030" stroke="#ff5b6e" stroke-width="2"/>
+            <line x1="0" y1="0" x2="-14" y2="14" stroke="#ff5b6e" stroke-width="3" stroke-linecap="round"/>
+            <circle cx="0" cy="0" r="3" fill="#ff5b6e"/>
+            <text x="0" y="50" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="11" fill="#ff5b6e" font-weight="600">-0.8</text>
+            <text x="0" y="65" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="9" fill="#7a8195">push back</text>
+          </g>
+          <!-- Middle knob -->
+          <g transform="translate(135, 50)">
+            <circle cx="0" cy="0" r="26" fill="#1c2030" stroke="#3a4258" stroke-width="2"/>
+            <line x1="0" y1="0" x2="0" y2="-16" stroke="#7a8195" stroke-width="3" stroke-linecap="round"/>
+            <circle cx="0" cy="0" r="3" fill="#7a8195"/>
+            <text x="0" y="50" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="11" fill="#7a8195" font-weight="600">0.0</text>
+            <text x="0" y="65" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="9" fill="#7a8195">ignore</text>
+          </g>
+          <!-- Up knob -->
+          <g transform="translate(230, 50)">
+            <circle cx="0" cy="0" r="26" fill="#1c2030" stroke="#5fb3ff" stroke-width="2"/>
+            <line x1="0" y1="0" x2="14" y2="-10" stroke="#5fb3ff" stroke-width="3" stroke-linecap="round"/>
+            <circle cx="0" cy="0" r="3" fill="#5fb3ff"/>
+            <text x="0" y="50" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="11" fill="#5fb3ff" font-weight="600">+0.9</text>
+            <text x="0" y="65" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="9" fill="#7a8195">amplify</text>
+          </g>
+        </g>
+
+        <!-- Bottom: combined picture -->
+        <g transform="translate(100, 200)">
+          <text x="300" y="0" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="10" fill="#5fb3ff" letter-spacing="2">PUT THEM TOGETHER</text>
+          <!-- Three input bulbs -->
+          <circle cx="40" cy="80" r="18" fill="#ffb547" stroke="#ffb547" stroke-width="1.5"/>
+          <circle cx="40" cy="80" r="24" fill="#ffb547" opacity=".12"/>
+          <text x="40" y="115" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="9" fill="#7a8195">bright</text>
+
+          <circle cx="40" cy="40" r="18" fill="#6b5a3a" stroke="#8a7a4a" stroke-width="1.5" opacity=".85"/>
+          <text x="40" y="20" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="9" fill="#7a8195">dim</text>
+
+          <circle cx="40" cy="120" r="18" fill="#1c2030" stroke="#3a4258" stroke-width="1.5"/>
+          <text x="40" y="150" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="9" fill="#7a8195">off</text>
+
+          <!-- Volume knobs on wires -->
+          <line x1="58" y1="40" x2="240" y2="78" stroke="#ff5b6e" stroke-width="2" opacity=".6"/>
+          <line x1="58" y1="80" x2="240" y2="80" stroke="#5fb3ff" stroke-width="3" opacity=".85"/>
+          <line x1="58" y1="120" x2="240" y2="82" stroke="#5fb3ff" stroke-width="1.5" opacity=".5"/>
+
+          <circle cx="150" cy="56" r="10" fill="#0b0d12" stroke="#ff5b6e" stroke-width="1.5"/>
+          <line x1="150" y1="56" x2="145" y2="61" stroke="#ff5b6e" stroke-width="2"/>
+          <circle cx="150" cy="80" r="10" fill="#0b0d12" stroke="#5fb3ff" stroke-width="1.5"/>
+          <line x1="150" y1="80" x2="155" y2="75" stroke="#5fb3ff" stroke-width="2"/>
+          <circle cx="150" cy="101" r="10" fill="#0b0d12" stroke="#5fb3ff" stroke-width="1.5"/>
+          <line x1="150" y1="101" x2="154" y2="97" stroke="#5fb3ff" stroke-width="2"/>
+
+          <!-- Output bulb -->
+          <circle cx="260" cy="80" r="26" fill="#ffb547" stroke="#ffb547" stroke-width="2"/>
+          <circle cx="260" cy="80" r="34" fill="#ffb547" opacity=".15"/>
+          <text x="260" y="125" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="9" fill="#7a8195">output lights up</text>
+
+          <!-- Explanation -->
+          <g transform="translate(340, 30)">
+            <rect x="0" y="0" width="260" height="110" rx="10" fill="#0b0d12" stroke="#2a3045"/>
+            <text x="15" y="22" font-family="JetBrains Mono,monospace" font-size="10" fill="#ffb547" letter-spacing="2">THE ONE IDEA</text>
+            <text x="15" y="45" font-family="Fraunces,serif" font-size="14" fill="#e9ecf1">Bright inputs +</text>
+            <text x="15" y="65" font-family="Fraunces,serif" font-size="14" fill="#e9ecf1">high volume knobs</text>
+            <text x="15" y="90" font-family="Fraunces,serif" font-size="14" fill="#ffb547" font-style="italic">→ next bulb glows.</text>
+          </g>
+        </g>
+      </svg>
+    </div>
+  </div>
+
+  <div class="step" data-step="15">
     <h2 class="step-title">Training: tweak the knobs until it gets things right</h2>
-    <p class="step-desc">We start with random weights — the network's guesses are nonsense. We show it labeled examples ("this image is a 3"), measure how wrong it was (the <em>loss</em>), and nudge every weight a tiny bit in the direction that reduces the error. Repeat thousands of times. Hit <em>auto-train</em> to watch.</p>
+    <p class="step-desc">Show the network a labeled example ("this image is a <em>3</em>"). Measure how wrong its guess was — that number is called the <em>loss</em>. Then nudge every weight a tiny bit in the direction that would have reduced the loss. Repeat with thousands of examples. The "nudge" part has an engineering name (<em>backpropagation</em>), but it's just calculus telling each knob which way to turn.</p>
     <div class="canvas-wrap" style="flex-direction:column;align-items:stretch;padding:20px">
       <div class="train-controls">
         <button id="trainStep">▶ TRAIN ONE STEP</button>
@@ -458,18 +601,28 @@
         <button id="trainReset" class="ghost">⟲ RESET</button>
         <span class="train-stats">EPOCH: <b id="epoch">0</b> · ACCURACY: <b id="accuracy">10%</b> · LOSS: <b id="loss">2.30</b></span>
       </div>
+      <div id="trainPredictBar" style="display:flex;align-items:center;gap:14px;padding:12px 14px;margin-bottom:12px;background:#0b0d12;border:1px solid #242838;border-radius:8px;flex-wrap:wrap">
+        <span style="font-family:'JetBrains Mono',monospace;font-size:10px;color:#7a8195;letter-spacing:.2em">SHOWING:</span>
+        <span style="font-family:Fraunces,serif;font-size:26px;color:#ffb547;font-weight:700">3</span>
+        <span style="font-family:'JetBrains Mono',monospace;font-size:10px;color:#7a8195;letter-spacing:.2em;margin-left:12px">NETWORK GUESSES:</span>
+        <span id="trainGuess" style="font-family:Fraunces,serif;font-size:28px;font-weight:700;color:#ff5b6e">9</span>
+        <span id="trainVerdict" style="font-family:'JetBrains Mono',monospace;font-size:11px;color:#ff5b6e;letter-spacing:.15em">✗ WRONG</span>
+      </div>
       <svg viewBox="0 0 800 360">
         <g id="trainExamples"></g>
         <g id="trainNetwork"></g>
         <g id="lossCurve"></g>
       </svg>
+      <div style="margin-top:10px;padding:10px 14px;background:#0b0d12;border:1px dashed #2a3045;border-radius:8px;font-family:'JetBrains Mono',monospace;font-size:10px;color:#7a8195;line-height:1.6">
+        Starting accuracy is <b style="color:#ffb547">10%</b> because random guessing one of ten digits gets it right 1 in 10 times. Trained, this same network hits <b style="color:#5fffa0">~98%</b>.
+      </div>
     </div>
-    <div class="formula">loss = how_wrong( prediction, true_label )  →  adjust every weight a tiny bit to reduce loss</div>
+    <div class="formula">loss = how_wrong( prediction, true_label )  →  nudge every weight a tiny bit to reduce loss</div>
   </div>
 
-  <div class="step" data-step="15">
-    <h2 class="step-title">The secret sauce is just numbers</h2>
-    <p class="step-desc">There's no magic inside a trained neural network — just <em>weights</em>, saved as giant tables of floating-point numbers. The architecture is a recipe; the weights are the actual knowledge. Copy those numbers to another machine and you've copied the entire trained model.</p>
+  <div class="step" data-step="17">
+    <h2 class="step-title">The secret sauce is just numbers in a file</h2>
+    <p class="step-desc">When you "download a model," <em>this is what's actually on disk</em>: weights, saved as giant tables of decimal numbers. The architecture is a recipe (a few hundred lines of code); the weights are the actual knowledge. Copy these numbers to another machine and you've copied the entire trained model. That's literally it — no hidden sauce.</p>
     <div class="canvas-wrap" style="flex-direction:column;align-items:stretch;padding:22px 20px">
       <div class="tensor-grid">
         <div class="tensor-card">
@@ -497,9 +650,63 @@
     <div class="formula">model = { architecture (code) + weights (numbers) }  ·  the weights <b>are</b> the learning</div>
   </div>
 
+  <div class="step" data-step="18">
+    <h2 class="step-title">That's the whole idea</h2>
+    <p class="step-desc">Strip away the jargon and a neural network is just: <em>numbers in → multiply and add → a number out</em>. Training finds the right numbers. The "AI" you've been hearing about — ChatGPT, Claude, image generators — is exactly this, scaled up by billions of weights. Same math, same training loop, same file-full-of-numbers. You now know how it works.</p>
+    <div class="canvas-wrap">
+      <svg viewBox="0 0 800 360">
+        <!-- Three boxes -->
+        <g>
+          <rect x="40" y="120" width="180" height="120" rx="14" fill="#0b0d12" stroke="#5fb3ff" stroke-width="2"/>
+          <text x="130" y="155" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="10" fill="#5fb3ff" letter-spacing="3">INPUT</text>
+          <text x="130" y="190" text-anchor="middle" font-family="Fraunces,serif" font-size="20" fill="#e9ecf1" font-weight="600">numbers</text>
+          <text x="130" y="215" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="10" fill="#7a8195">pixels, words, audio…</text>
+        </g>
+
+        <g>
+          <rect x="300" y="120" width="200" height="120" rx="14" fill="#0b0d12" stroke="#ffb547" stroke-width="2"/>
+          <text x="400" y="155" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="10" fill="#ffb547" letter-spacing="3">THE NETWORK</text>
+          <text x="400" y="190" text-anchor="middle" font-family="Fraunces,serif" font-size="20" fill="#e9ecf1" font-weight="600">multiply + add</text>
+          <text x="400" y="215" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="10" fill="#7a8195">weights do the work</text>
+        </g>
+
+        <g>
+          <rect x="580" y="120" width="180" height="120" rx="14" fill="#0b0d12" stroke="#5fffa0" stroke-width="2"/>
+          <text x="670" y="155" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="10" fill="#5fffa0" letter-spacing="3">OUTPUT</text>
+          <text x="670" y="190" text-anchor="middle" font-family="Fraunces,serif" font-size="20" fill="#e9ecf1" font-weight="600">an answer</text>
+          <text x="670" y="215" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="10" fill="#7a8195">"it's a 3"</text>
+        </g>
+
+        <!-- Arrows -->
+        <g>
+          <line x1="225" y1="180" x2="292" y2="180" stroke="#7a8195" stroke-width="2"/>
+          <polygon points="292,174 302,180 292,186" fill="#7a8195"/>
+          <line x1="505" y1="180" x2="572" y2="180" stroke="#7a8195" stroke-width="2"/>
+          <polygon points="572,174 582,180 572,186" fill="#7a8195"/>
+        </g>
+
+        <!-- Training annotation pointing at middle -->
+        <g>
+          <path d="M 400 80 L 400 118" stroke="#ffb547" stroke-width="1.5" stroke-dasharray="3,3"/>
+          <polygon points="394,112 400,120 406,112" fill="#ffb547"/>
+          <rect x="280" y="40" width="240" height="42" rx="8" fill="#0b0d12" stroke="#ffb547" stroke-width="1.5"/>
+          <text x="400" y="60" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="10" fill="#ffb547" letter-spacing="2">TRAINING TUNES THIS PART</text>
+          <text x="400" y="75" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="10" fill="#7a8195">(= adjusting the numbers)</text>
+        </g>
+
+        <!-- Closing line -->
+        <g transform="translate(400, 290)">
+          <text x="0" y="0" text-anchor="middle" font-family="Fraunces,serif" font-size="18" fill="#e9ecf1" font-style="italic">Scale this up by a billion.</text>
+          <text x="0" y="28" text-anchor="middle" font-family="Fraunces,serif" font-size="18" fill="#ffb547" font-weight="600">That's modern AI.</text>
+        </g>
+      </svg>
+    </div>
+    <div class="formula">every model you've heard of = this picture, bigger  ·  you now know how it works</div>
+  </div>
+
   <div class="controls">
     <button id="prev">← PREV</button>
-    <span class="counter" id="counter">STEP 01 / 15</span>
+    <span class="counter" id="counter">STEP 01 / 18</span>
     <button id="next">NEXT →</button>
   </div>
 </div>
@@ -515,6 +722,38 @@ const digit3 = [
   [0,  1,    0.4,0,  0,  0.3,1,   0  ],
   [0,  0.3,  1,  1,  1,  0.8,0.2, 0  ]
 ];
+
+// HOOK SLIDE: gallery of small hand-drawn digits
+const hookDigits = document.getElementById('hookDigits');
+const miniDigits = [
+  {label:'3', grid: [
+    [0,0.3,1,1,1,1,0.4,0],[0,1,0.5,0,0,0.2,1,0.3],[0,0.2,0,0,0,0,1,0],[0,0,0,0.7,1,1,0.6,0],
+    [0,0,0,0,0,0.3,1,0],[0,0,0,0,0,0,1,0.2],[0,1,0.4,0,0,0.3,1,0],[0,0.3,1,1,1,0.8,0.2,0]
+  ]},
+  {label:'7', grid: [[0,1,1,1,1,1,1,0],[0,0,0,0,0,0,1,0],[0,0,0,0,0,1,0,0],[0,0,0,0,1,0,0,0],[0,0,0,1,0,0,0,0],[0,0,1,0,0,0,0,0],[0,0,1,0,0,0,0,0],[0,0,1,0,0,0,0,0]]},
+  {label:'0', grid: [[0,0,1,1,1,1,0,0],[0,1,0,0,0,0,1,0],[1,0,0,0,0,0,0,1],[1,0,0,0,0,0,0,1],[1,0,0,0,0,0,0,1],[1,0,0,0,0,0,0,1],[0,1,0,0,0,0,1,0],[0,0,1,1,1,1,0,0]]},
+  {label:'5', grid: [[0,1,1,1,1,1,0,0],[0,1,0,0,0,0,0,0],[0,1,0,0,0,0,0,0],[0,1,1,1,1,0,0,0],[0,0,0,0,0,1,0,0],[0,0,0,0,0,0,1,0],[0,0.5,0,0,0,1,0,0],[0,0,1,1,1,0.5,0,0]]},
+  {label:'8', grid: [[0,0,1,1,1,1,0,0],[0,1,0,0,0,0,1,0],[0,1,0,0,0,0,1,0],[0,0,1,1,1,1,0,0],[0,1,0,0,0,0,1,0],[1,0,0,0,0,0,0,1],[0,1,0,0,0,0,1,0],[0,0,1,1,1,1,0,0]]}
+];
+function brightnessToFillHook(v) {
+  if (v === 0) return '#1c2030';
+  const base = 28, lit = 244;
+  const c = Math.round(base + v * (lit - base));
+  return `rgb(${c},${c},${c+6})`;
+}
+if (hookDigits) {
+  const sz = 8;
+  miniDigits.forEach((d, idx) => {
+    const ox = 40 + idx * 90;
+    const oy = 130;
+    d.grid.forEach((row, r) => row.forEach((v, c) => {
+      hookDigits.innerHTML += `<rect x="${ox+c*sz}" y="${oy+r*sz}" width="${sz-1}" height="${sz-1}" fill="${brightnessToFillHook(v)}"/>`;
+    }));
+    hookDigits.innerHTML += `<rect x="${ox-2}" y="${oy-2}" width="${sz*8+3}" height="${sz*8+3}" fill="none" stroke="#2a3045" stroke-width="1"/>`;
+    hookDigits.innerHTML += `<text x="${ox+sz*4}" y="${oy+sz*8+22}" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="12" fill="#7a8195">"${d.label}"?</text>`;
+  });
+  hookDigits.innerHTML += `<text x="220" y="110" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="10" fill="#ffb547" letter-spacing="3">MESSY HANDWRITTEN DIGITS</text>`;
+}
 
 // STEP 1
 const pg = document.getElementById('pixelGrid');
@@ -870,15 +1109,22 @@ const examples = [
 ];
 
 function drawTrainExamples() {
-  trainEx.innerHTML = '<text x="30" y="20" font-family="JetBrains Mono,monospace" font-size="10" fill="#7a8195" letter-spacing="2">LABELED EXAMPLES</text>';
+  trainEx.innerHTML = '<text x="30" y="20" font-family="JetBrains Mono,monospace" font-size="10" fill="#7a8195" letter-spacing="2">LABELED EXAMPLES (teaching data)</text>';
   examples.forEach((ex,i) => {
     const xOff = 30 + i*100, yOff = 35, sz = 8;
+    const isCurrent = ex.label === '3';
     ex.grid.forEach((row,r) => row.forEach((v,c) => {
       trainEx.innerHTML += `<rect x="${xOff+c*sz}" y="${yOff+r*sz}" width="${sz-1}" height="${sz-1}" fill="${brightnessToFill(v)}"/>`;
     }));
-    trainEx.innerHTML += `<rect x="${xOff-2}" y="${yOff-2}" width="${sz*8+3}" height="${sz*8+3}" fill="none" stroke="#2a3045" stroke-width="1"/><text x="${xOff+sz*4}" y="${yOff+sz*8+18}" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="11" fill="#5fb3ff">label: "${ex.label}"</text>`;
+    const borderColor = isCurrent ? '#ffb547' : '#2a3045';
+    const borderWidth = isCurrent ? 2 : 1;
+    trainEx.innerHTML += `<rect x="${xOff-3}" y="${yOff-3}" width="${sz*8+5}" height="${sz*8+5}" fill="none" stroke="${borderColor}" stroke-width="${borderWidth}"/>`;
+    trainEx.innerHTML += `<text x="${xOff+sz*4}" y="${yOff+sz*8+18}" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="11" fill="${isCurrent?'#ffb547':'#5fb3ff'}">label: "${ex.label}"</text>`;
+    if (isCurrent) {
+      trainEx.innerHTML += `<text x="${xOff+sz*4}" y="${yOff-8}" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="8" fill="#ffb547" letter-spacing="2">CURRENT</text>`;
+    }
   });
-  trainEx.innerHTML += '<text x="30" y="120" font-family="JetBrains Mono,monospace" font-size="9" fill="#7a8195">(thousands more...)</text>';
+  trainEx.innerHTML += '<text x="30" y="120" font-family="JetBrains Mono,monospace" font-size="9" fill="#7a8195">(thousands more like these…)</text>';
 }
 
 let epoch = 0;
@@ -934,6 +1180,10 @@ function drawLossCurve() {
   lossCurve.innerHTML += `<circle cx="${lpx}" cy="${lpy}" r="3" fill="#ffb547"/>`;
 }
 
+// Predict sequence: what the network "guesses" as training progresses.
+// Pedagogical: start confidently wrong, cycle through near-misses, converge on 3.
+const predictSequence = ['9','9','1','8','8','5','5','2','3','3','3','3','3','3','3','3','3','3','3','3','3','3','3','3','3','3','3','3','3','3','3'];
+
 function updateTrainStats() {
   document.getElementById('epoch').textContent = epoch;
   const loss = 2.30 * Math.exp(-epoch * 0.15) + 0.05;
@@ -941,6 +1191,17 @@ function updateTrainStats() {
   const acc = Math.min(98, 10 + (1 - Math.exp(-epoch * 0.12)) * 88);
   document.getElementById('accuracy').textContent = Math.round(acc) + '%';
   weightStrength = Math.min(1, epoch/20);
+  // Live prediction readout
+  const guessEl = document.getElementById('trainGuess');
+  const verdictEl = document.getElementById('trainVerdict');
+  if (guessEl && verdictEl) {
+    const guess = predictSequence[Math.min(epoch, predictSequence.length - 1)];
+    const correct = guess === '3';
+    guessEl.textContent = guess;
+    guessEl.style.color = correct ? '#5fffa0' : '#ff5b6e';
+    verdictEl.textContent = correct ? '✓ CORRECT' : '✗ WRONG';
+    verdictEl.style.color = correct ? '#5fffa0' : '#ff5b6e';
+  }
 }
 
 function trainOneStep() {
@@ -1021,7 +1282,7 @@ const steps = document.querySelectorAll('.step');
 const stepBtns = document.querySelectorAll('#stepBar button');
 const counter = document.getElementById('counter');
 let current = 1;
-const TOTAL = 15;
+const TOTAL = 18;
 function goto(n) {
   current = Math.max(1, Math.min(TOTAL, n));
   steps.forEach(s => s.classList.toggle('active', +s.dataset.step === current));
