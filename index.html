@@ -1,0 +1,922 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>How a Neural Network Reads a Digit</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#0e1014;--panel:#161922;--ink:#e9ecf1;--muted:#7a8195;
+    --accent:#ffb547;--accent-2:#5fb3ff;--hot:#ff5b6e;--good:#5fffa0;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;background:var(--bg);color:var(--ink);font-family:'Fraunces',serif;-webkit-font-smoothing:antialiased}
+  body{
+    background:radial-gradient(1200px 600px at 80% -10%, rgba(255,181,71,.08), transparent 60%),
+      radial-gradient(900px 500px at 0% 100%, rgba(95,179,255,.08), transparent 60%),var(--bg);
+    min-height:100vh;padding:24px 16px 60px;
+  }
+  header{max-width:1100px;margin:0 auto 24px;text-align:center}
+  header .sub{margin-left:auto;margin-right:auto}
+  .eyebrow{font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:.25em;text-transform:uppercase;color:var(--accent)}
+  h1{font-family:'Fraunces',serif;font-weight:800;font-size:clamp(28px,5vw,52px);line-height:1.05;margin:8px 0 12px;letter-spacing:-.02em}
+  h1 em{font-style:italic;color:var(--accent)}
+  .sub{color:var(--muted);max-width:700px;font-size:15px;line-height:1.5}
+  .stage{max-width:1100px;margin:0 auto;background:var(--panel);border:1px solid #232735;border-radius:18px;padding:24px;box-shadow:0 30px 80px -30px rgba(0,0,0,.6)}
+  .step-bar{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:20px;border-bottom:1px solid #242838;padding-bottom:16px}
+  .step-bar button{background:transparent;color:var(--muted);border:1px solid #2a2f40;border-radius:999px;padding:7px 12px;font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:.12em;text-transform:uppercase;cursor:pointer;transition:.2s}
+  .step-bar button:hover{color:var(--ink);border-color:#3a4258}
+  .step-bar button.active{background:var(--accent);color:#1a1408;border-color:var(--accent);font-weight:600}
+  .step{display:none;animation:fade .4s ease}
+  .step.active{display:block}
+  @keyframes fade{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+  .step-title{font-size:20px;font-weight:600;margin:0 0 6px;letter-spacing:-.01em}
+  .step-desc{color:var(--muted);margin:0 0 18px;font-size:14px;line-height:1.55;max-width:760px}
+  .step-desc em{color:var(--accent);font-style:italic}
+  .canvas-wrap{background:#0b0d12;border-radius:12px;border:1px solid #1d2130;padding:16px;display:flex;justify-content:center;align-items:center;min-height:380px;overflow-x:auto}
+  svg{max-width:100%;height:auto;display:block}
+  .legend{display:flex;gap:16px;flex-wrap:wrap;margin-top:14px;font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--muted);letter-spacing:.05em}
+  .legend span{display:inline-flex;align-items:center;gap:6px}
+  .swatch{width:12px;height:12px;border-radius:2px;display:inline-block}
+  .controls{display:flex;justify-content:space-between;align-items:center;margin-top:18px;padding-top:16px;border-top:1px solid #242838}
+  .controls button{background:#1f2434;color:var(--ink);border:1px solid #2a3045;border-radius:8px;padding:10px 16px;font-family:'JetBrains Mono',monospace;font-size:11px;cursor:pointer;letter-spacing:.1em}
+  .controls button:hover{background:#262c40}
+  .controls button:disabled{opacity:.3;cursor:not-allowed}
+  .counter{font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--muted);letter-spacing:.2em}
+  .formula{background:#0b0d12;border:1px solid #1d2130;border-radius:8px;padding:12px 16px;margin-top:14px;font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--accent-2);overflow-x:auto;white-space:nowrap}
+  .formula b{color:var(--accent)}
+  .knob-panel{display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:18px;margin-top:8px}
+  .knob{display:flex;flex-direction:column;align-items:center;gap:6px}
+  .knob-label{font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--muted);letter-spacing:.1em}
+  .knob-dial{width:80px;height:80px;border-radius:50%;background:radial-gradient(circle at 30% 30%, #2a3045, #0b0d12);border:2px solid #2a3045;position:relative;cursor:ns-resize;user-select:none;box-shadow:0 4px 12px rgba(0,0,0,.4), inset 0 2px 6px rgba(255,255,255,.05);transition:border-color .2s;touch-action:none}
+  .knob-dial:hover{border-color:var(--accent)}
+  .knob-dial::after{content:'';position:absolute;top:6px;left:50%;width:3px;height:18px;background:var(--accent);border-radius:2px;transform-origin:50% 34px;transform:translateX(-50%) rotate(var(--angle, 0deg))}
+  .knob-value{font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--accent);font-weight:600}
+  .knob-output{margin-top:14px;padding:14px;background:#0b0d12;border:1px solid #1d2130;border-radius:8px;display:flex;justify-content:space-around;align-items:center;flex-wrap:wrap;gap:12px}
+  .knob-output .item{text-align:center}
+  .knob-output .item-label{font-family:'JetBrains Mono',monospace;font-size:9px;color:var(--muted);letter-spacing:.15em;text-transform:uppercase}
+  .knob-output .item-val{font-family:'Fraunces',serif;font-size:22px;color:var(--accent);font-weight:600;margin-top:4px}
+  .train-controls{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-bottom:16px}
+  .train-controls button{background:var(--accent);color:#1a1408;border:none;padding:10px 16px;border-radius:8px;font-family:'JetBrains Mono',monospace;font-size:11px;font-weight:600;letter-spacing:.1em;cursor:pointer}
+  .train-controls button:hover{filter:brightness(1.1)}
+  .train-controls button.ghost{background:transparent;color:var(--muted);border:1px solid #2a3045}
+  .train-stats{font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--muted);letter-spacing:.1em}
+  .train-stats b{color:var(--accent)}
+  .knob-hint{font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--muted);text-align:center;margin-top:8px;letter-spacing:.05em}
+  .defs{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:16px}
+  .def{background:#12151e;border:1px solid #242838;border-radius:12px;padding:16px 18px}
+  .def-wide{grid-column:1/-1;border-color:#2a3045;background:linear-gradient(180deg, rgba(255,181,71,.04), #12151e)}
+  .def-term{font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:.18em;text-transform:uppercase;color:var(--accent);margin-bottom:8px}
+  .def-body{color:var(--ink);font-size:14px;line-height:1.6;opacity:.92}
+  .def-body em{color:var(--accent);font-style:italic}
+  .tensor-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:14px;margin-bottom:20px}
+  .tensor-card{background:#0b0d12;border:1px solid #242838;border-radius:10px;padding:12px 14px;overflow:hidden}
+  .tensor-label{font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--accent);letter-spacing:.12em;margin-bottom:8px;text-transform:uppercase}
+  .tensor-label span{color:var(--muted);text-transform:none;letter-spacing:.08em;margin-left:4px}
+  .tensor-body{font-family:'JetBrains Mono',monospace;font-size:11px;line-height:1.45;color:#5fb3ff;margin:0;white-space:pre;overflow-x:auto;max-height:160px}
+  .tensor-body .neg{color:#ff7a8a}
+  .tensor-body .pos{color:#7fc8ff}
+  .scale-panel{background:#0b0d12;border:1px solid #242838;border-radius:10px;padding:16px 18px}
+  .scale-header{font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--accent);letter-spacing:.18em;text-transform:uppercase;margin-bottom:14px}
+  .scale-rows{display:flex;flex-direction:column;gap:10px}
+  .scale-row{display:grid;grid-template-columns:220px 1fr 140px;gap:12px;align-items:center;font-family:'JetBrains Mono',monospace;font-size:12px}
+  .scale-name{color:var(--ink)}
+  .scale-bar{background:#1c2030;border-radius:3px;height:10px;overflow:hidden;position:relative}
+  .scale-bar>span{display:block;height:100%;background:linear-gradient(90deg,#5fb3ff,var(--accent));border-radius:3px;min-width:2px}
+  .scale-count{color:var(--accent);text-align:right;font-weight:600}
+  .scale-footnote{font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--muted);line-height:1.55;margin-top:14px;padding-top:12px;border-top:1px solid #1d2130}
+  @media (max-width: 640px){ .scale-row{grid-template-columns:1fr;gap:4px} .scale-bar{height:8px} }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>How a network <em>sees</em> a digit</h1>
+</header>
+
+<div class="stage">
+  <div class="step-bar" id="stepBar">
+    <button class="active" data-step="1">01 · Basics</button>
+    <button data-step="2">02 · Pixels</button>
+    <button data-step="3">03 · Layout</button>
+    <button data-step="4">04 · Input</button>
+    <button data-step="5">05 · Hidden</button>
+    <button data-step="6">06 · Output</button>
+    <button data-step="7">07 · Weights = Knobs</button>
+    <button data-step="8">08 · Untrained</button>
+    <button data-step="9">09 · Training</button>
+    <button data-step="10">10 · Trained</button>
+    <button data-step="11">11 · The Secret Sauce</button>
+  </div>
+
+  <div class="step active" data-step="1">
+    <h2 class="step-title">First, the basics</h2>
+    <p class="step-desc">Before we trace a digit through the network, a few plain-English definitions — no math required.</p>
+    <div class="canvas-wrap" style="min-height:auto;padding:28px 24px;display:block">
+      <div class="defs">
+        <div class="def">
+          <div class="def-term">Neural network</div>
+          <div class="def-body">A stack of simple math functions arranged in layers. You feed numbers in one end (like the pixels of an image), the numbers flow through the layers, and an answer pops out the other end (like "this is a 3"). The network isn't <em>programmed</em> with rules — it's <em>trained</em> by showing it thousands of examples until it gets good at guessing.</div>
+        </div>
+        <div class="def">
+          <div class="def-term">Neuron</div>
+          <div class="def-body">A tiny unit that holds a single number between 0 and 1 — think of it as how "excited" or "lit up" it is. Each neuron looks at the neurons feeding into it, does a little weighted sum, and decides how excited <em>it</em> should be. Stack thousands of these together and you get surprisingly smart behavior.</div>
+        </div>
+        <div class="def">
+          <div class="def-term">Weight</div>
+          <div class="def-body">The strength of the connection between two neurons — like a volume knob. A big weight means "this input matters a lot to me." A near-zero weight means "ignore this one." <em>Training</em> is just the process of nudging millions of these knobs until the whole network behaves.</div>
+        </div>
+        <div class="def">
+          <div class="def-term">Layer</div>
+          <div class="def-body">A row of neurons that all do their work at the same time. Data flows layer by layer: pixels → hidden layer (which spots patterns like edges and curves) → output layer (which names the digit). Each layer builds on what the previous one found.</div>
+        </div>
+        <div class="def def-wide">
+          <div class="def-term">Borrowed from neuroscience: "neurons that fire together, wire together"</div>
+          <div class="def-body">Hebb's famous line about real brains: when two biological neurons activate at the same time, the connection between them strengthens. Artificial neural networks lean on the same idea in a <em>very</em> loose way — during training, connections that consistently help the network get the right answer grow stronger, while unhelpful ones shrink. The math is different from a real brain, but the intuition rhymes: <em>useful partnerships get reinforced.</em></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="step" data-step="2">
+    <h2 class="step-title">The image is just a grid of numbers</h2>
+    <p class="step-desc">A handwritten "3" is captured as a small grid of pixels. Each pixel has a brightness value between 0 (black) and 1 (white). The network never sees the picture — only these numbers.</p>
+    <div class="canvas-wrap">
+      <svg viewBox="0 0 700 380">
+        <g id="pixelGrid"></g>
+        <g transform="translate(330,190)">
+          <line x1="0" y1="0" x2="60" y2="0" stroke="#5fb3ff" stroke-width="2"/>
+          <polygon points="60,-6 72,0 60,6" fill="#5fb3ff"/>
+          <text x="36" y="-12" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="10" fill="#7a8195">FLATTEN</text>
+        </g>
+        <g transform="translate(420,40)" id="numMatrix"></g>
+        <text x="160" y="370" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="11" fill="#7a8195">8 × 8 PIXEL IMAGE</text>
+        <text x="540" y="370" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="11" fill="#7a8195">64 BRIGHTNESS VALUES</text>
+      </svg>
+    </div>
+    <div class="legend">
+      <span><span class="swatch" style="background:#f4f6fb"></span>1.0 — fully bright (ink)</span>
+      <span><span class="swatch" style="background:#8a8a90"></span>0.5 — partial brightness (edge)</span>
+      <span><span class="swatch" style="background:#1c2030;border:1px solid #2a3045"></span>0.0 — dark (background)</span>
+    </div>
+  </div>
+
+  <div class="step" data-step="3">
+    <h2 class="step-title">The network's anatomy</h2>
+    <p class="step-desc">Before we trace how data flows through it, here's the full layout — three layers of neurons connected by weights. Each circle is a neuron, each line is a connection. We'll walk through each piece next.</p>
+    <div class="canvas-wrap">
+      <svg viewBox="0 0 800 460">
+        <g id="layoutConnIH"></g>
+        <g id="layoutConnHO"></g>
+        <g id="layoutInput"></g>
+        <g id="layoutHidden"></g>
+        <g id="layoutOutput"></g>
+        <text x="180" y="445" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="11" fill="#7a8195">INPUT LAYER · 64</text>
+        <text x="430" y="445" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="11" fill="#7a8195">HIDDEN LAYER · 16</text>
+        <text x="680" y="445" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="11" fill="#7a8195">OUTPUT LAYER · 10</text>
+        <text x="180" y="30" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="10" fill="#5fb3ff" letter-spacing="2">one per pixel</text>
+        <text x="680" y="30" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="10" fill="#5fb3ff" letter-spacing="2">one per digit 0–9</text>
+      </svg>
+    </div>
+    <div class="legend">
+      <span><span class="swatch" style="background:transparent;border:1.5px solid #5fb3ff"></span>neuron (holds a number)</span>
+      <span><span class="swatch" style="background:#3a4258"></span>connection (has a weight)</span>
+    </div>
+  </div>
+
+  <div class="step" data-step="4">
+    <h2 class="step-title">Each pixel becomes an input neuron</h2>
+    <p class="step-desc">The flattened list of 64 brightness values is fed into 64 input neurons. Each input neuron simply holds one pixel's value. Think of this layer as the eyes of the network.</p>
+    <div class="canvas-wrap">
+      <svg viewBox="0 0 700 380">
+        <g id="pixelGrid2"></g>
+        <g id="inputLines"></g>
+        <g id="inputNeurons"></g>
+        <text x="120" y="370" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="11" fill="#7a8195">PIXELS</text>
+        <text x="500" y="370" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="11" fill="#7a8195">INPUT LAYER · 64 NEURONS</text>
+      </svg>
+    </div>
+    <div class="formula">input neuron <b>x<sub>i</sub></b> = pixel<sub>i</sub> brightness  ·  <b>i</b> = 1 to 64</div>
+  </div>
+
+  <div class="step" data-step="5">
+    <h2 class="step-title">Hidden neurons: multiply, add, activate</h2>
+    <p class="step-desc">Each connection has a <em>weight</em>. The hidden neuron multiplies each input by its weight, sums them up, then runs the total through ReLU — which simply outputs the number if it's positive, or zero if it's negative. Here's one hidden neuron with 3 inputs, worked out:</p>
+    <div class="canvas-wrap">
+      <svg viewBox="0 0 720 380">
+        <!-- Input neurons -->
+        <g>
+          <circle cx="120" cy="90" r="22" fill="#ffb547" stroke="#ffb547" stroke-width="2"/>
+          <text x="120" y="95" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="14" fill="#1a1408" font-weight="600">1</text>
+          <text x="80" y="95" text-anchor="end" font-family="JetBrains Mono,monospace" font-size="12" fill="#7a8195">x₁ =</text>
+
+          <circle cx="120" cy="190" r="22" fill="#1c2030" stroke="#5fb3ff" stroke-width="2"/>
+          <text x="120" y="195" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="14" fill="#7a8195">0</text>
+          <text x="80" y="195" text-anchor="end" font-family="JetBrains Mono,monospace" font-size="12" fill="#7a8195">x₂ =</text>
+
+          <circle cx="120" cy="290" r="22" fill="#ffb547" stroke="#ffb547" stroke-width="2"/>
+          <text x="120" y="295" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="14" fill="#1a1408" font-weight="600">1</text>
+          <text x="80" y="295" text-anchor="end" font-family="JetBrains Mono,monospace" font-size="12" fill="#7a8195">x₃ =</text>
+        </g>
+
+        <!-- Weight connections with knobs -->
+        <g>
+          <!-- w1 = 0.3 -->
+          <line x1="142" y1="90" x2="398" y2="188" stroke="#5fb3ff" stroke-width="2" opacity=".7"/>
+          <circle cx="270" cy="139" r="18" fill="#0b0d12" stroke="#5fb3ff" stroke-width="1.5"/>
+          <line x1="270" y1="127" x2="270" y2="135" stroke="#ffb547" stroke-width="2.5"/>
+          <text x="270" y="143" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="10" fill="#5fb3ff" font-weight="600">.30</text>
+
+          <!-- w2 = 0.4 -->
+          <line x1="142" y1="190" x2="398" y2="200" stroke="#5fb3ff" stroke-width="2" opacity=".7"/>
+          <circle cx="270" cy="195" r="18" fill="#0b0d12" stroke="#5fb3ff" stroke-width="1.5"/>
+          <line x1="270" y1="183" x2="272" y2="192" stroke="#ffb547" stroke-width="2.5"/>
+          <text x="270" y="199" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="10" fill="#5fb3ff" font-weight="600">.40</text>
+
+          <!-- w3 = 0.45 -->
+          <line x1="142" y1="290" x2="398" y2="212" stroke="#5fb3ff" stroke-width="2" opacity=".7"/>
+          <circle cx="270" cy="251" r="18" fill="#0b0d12" stroke="#5fb3ff" stroke-width="1.5"/>
+          <line x1="270" y1="239" x2="274" y2="248" stroke="#ffb547" stroke-width="2.5"/>
+          <text x="270" y="255" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="10" fill="#5fb3ff" font-weight="600">.45</text>
+
+          <text x="270" y="40" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="10" fill="#7a8195" letter-spacing="2">WEIGHTS (knobs)</text>
+        </g>
+
+        <!-- Hidden neuron -->
+        <g>
+          <circle cx="420" cy="200" r="28" fill="#ffb547" stroke="#ffb547" stroke-width="2.5"/>
+          <text x="420" y="205" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="13" fill="#1a1408" font-weight="600">h</text>
+          <text x="420" y="248" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="10" fill="#7a8195">hidden neuron</text>
+        </g>
+
+        <!-- Math box on right -->
+        <g transform="translate(480, 70)">
+          <rect x="0" y="0" width="230" height="260" rx="10" fill="#0b0d12" stroke="#2a3045"/>
+          <text x="115" y="22" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="9" fill="#ffb547" letter-spacing="2">STEP BY STEP</text>
+
+          <text x="18" y="55" font-family="JetBrains Mono,monospace" font-size="13" fill="#e9ecf1">1 × .30 = </text>
+          <text x="195" y="55" text-anchor="end" font-family="JetBrains Mono,monospace" font-size="13" fill="#ffb547" font-weight="600">0.30</text>
+
+          <text x="18" y="82" font-family="JetBrains Mono,monospace" font-size="13" fill="#e9ecf1">0 × .40 = </text>
+          <text x="195" y="82" text-anchor="end" font-family="JetBrains Mono,monospace" font-size="13" fill="#ffb547" font-weight="600">0.00</text>
+
+          <text x="18" y="109" font-family="JetBrains Mono,monospace" font-size="13" fill="#e9ecf1">1 × .45 = </text>
+          <text x="195" y="109" text-anchor="end" font-family="JetBrains Mono,monospace" font-size="13" fill="#ffb547" font-weight="600">0.45</text>
+
+          <line x1="18" y1="125" x2="210" y2="125" stroke="#2a3045" stroke-width="1"/>
+
+          <text x="18" y="148" font-family="JetBrains Mono,monospace" font-size="13" fill="#7a8195">sum =</text>
+          <text x="195" y="148" text-anchor="end" font-family="JetBrains Mono,monospace" font-size="14" fill="#5fb3ff" font-weight="600">0.75</text>
+
+          <text x="18" y="180" font-family="JetBrains Mono,monospace" font-size="13" fill="#7a8195">ReLU(0.75) =</text>
+
+          <rect x="18" y="195" width="192" height="48" rx="6" fill="#1c2030" stroke="#5fffa0" stroke-width="1.5"/>
+          <text x="114" y="218" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="10" fill="#5fffa0" letter-spacing="2">h FIRES →</text>
+          <text x="114" y="238" text-anchor="middle" font-family="Fraunces,serif" font-size="20" fill="#5fffa0" font-weight="700">0.75</text>
+        </g>
+
+        <!-- Arrow -->
+        <g transform="translate(448, 200)">
+          <line x1="0" y1="0" x2="24" y2="0" stroke="#5fb3ff" stroke-width="2"/>
+          <polygon points="24,-5 32,0 24,5" fill="#5fb3ff"/>
+        </g>
+      </svg>
+    </div>
+    <div class="formula">h = ReLU( <b>w₁</b>·x₁ + <b>w₂</b>·x₂ + <b>w₃</b>·x₃ )  ·  ReLU keeps positive numbers, zeroes out negatives</div>
+  </div>
+
+  <div class="step" data-step="6">
+    <h2 class="step-title">Output layer: same math, 10 times</h2>
+    <p class="step-desc">Each output neuron does the exact same thing: multiply every hidden value by its weight, sum them up. Here are 3 hidden neurons feeding into the output neuron for digit "3". The output with the biggest number wins.</p>
+    <div class="canvas-wrap">
+      <svg viewBox="0 0 720 380">
+        <!-- Hidden neurons (results from step 3) -->
+        <g>
+          <circle cx="120" cy="90" r="22" fill="#ffb547" stroke="#ffb547" stroke-width="2"/>
+          <text x="120" y="95" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="12" fill="#1a1408" font-weight="600">0.75</text>
+          <text x="80" y="95" text-anchor="end" font-family="JetBrains Mono,monospace" font-size="12" fill="#7a8195">h₁ =</text>
+
+          <circle cx="120" cy="190" r="22" fill="#ffb547" stroke="#ffb547" stroke-width="2"/>
+          <text x="120" y="195" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="12" fill="#1a1408" font-weight="600">0.50</text>
+          <text x="80" y="195" text-anchor="end" font-family="JetBrains Mono,monospace" font-size="12" fill="#7a8195">h₂ =</text>
+
+          <circle cx="120" cy="290" r="22" fill="#ffb547" stroke="#ffb547" stroke-width="2"/>
+          <text x="120" y="295" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="12" fill="#1a1408" font-weight="600">0.20</text>
+          <text x="80" y="295" text-anchor="end" font-family="JetBrains Mono,monospace" font-size="12" fill="#7a8195">h₃ =</text>
+        </g>
+
+        <!-- Weight connections with knobs -->
+        <g>
+          <!-- w1 = 0.8 -->
+          <line x1="142" y1="90" x2="398" y2="188" stroke="#5fb3ff" stroke-width="2.5" opacity=".8"/>
+          <circle cx="270" cy="139" r="18" fill="#0b0d12" stroke="#5fb3ff" stroke-width="1.5"/>
+          <line x1="270" y1="125" x2="272" y2="134" stroke="#ffb547" stroke-width="2.5"/>
+          <text x="270" y="143" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="10" fill="#5fb3ff" font-weight="600">.80</text>
+
+          <!-- w2 = 0.5 -->
+          <line x1="142" y1="190" x2="398" y2="200" stroke="#5fb3ff" stroke-width="2" opacity=".7"/>
+          <circle cx="270" cy="195" r="18" fill="#0b0d12" stroke="#5fb3ff" stroke-width="1.5"/>
+          <line x1="270" y1="183" x2="273" y2="192" stroke="#ffb547" stroke-width="2.5"/>
+          <text x="270" y="199" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="10" fill="#5fb3ff" font-weight="600">.50</text>
+
+          <!-- w3 = 0.6 -->
+          <line x1="142" y1="290" x2="398" y2="212" stroke="#5fb3ff" stroke-width="2" opacity=".75"/>
+          <circle cx="270" cy="251" r="18" fill="#0b0d12" stroke="#5fb3ff" stroke-width="1.5"/>
+          <line x1="270" y1="238" x2="273" y2="247" stroke="#ffb547" stroke-width="2.5"/>
+          <text x="270" y="255" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="10" fill="#5fb3ff" font-weight="600">.60</text>
+
+          <text x="270" y="40" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="10" fill="#7a8195" letter-spacing="2">WEIGHTS (knobs)</text>
+        </g>
+
+        <!-- Output neuron -->
+        <g>
+          <circle cx="420" cy="200" r="30" fill="#ffb547" stroke="#ffb547" stroke-width="2.5"/>
+          <text x="420" y="205" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="15" fill="#1a1408" font-weight="700">"3"</text>
+          <text x="420" y="250" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="10" fill="#7a8195">output for digit 3</text>
+        </g>
+
+        <!-- Math box on right -->
+        <g transform="translate(480, 70)">
+          <rect x="0" y="0" width="230" height="260" rx="10" fill="#0b0d12" stroke="#2a3045"/>
+          <text x="115" y="22" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="9" fill="#ffb547" letter-spacing="2">STEP BY STEP</text>
+
+          <text x="18" y="55" font-family="JetBrains Mono,monospace" font-size="13" fill="#e9ecf1">.75 × .80 =</text>
+          <text x="210" y="55" text-anchor="end" font-family="JetBrains Mono,monospace" font-size="13" fill="#ffb547" font-weight="600">0.60</text>
+
+          <text x="18" y="82" font-family="JetBrains Mono,monospace" font-size="13" fill="#e9ecf1">.50 × .50 =</text>
+          <text x="210" y="82" text-anchor="end" font-family="JetBrains Mono,monospace" font-size="13" fill="#ffb547" font-weight="600">0.25</text>
+
+          <text x="18" y="109" font-family="JetBrains Mono,monospace" font-size="13" fill="#e9ecf1">.20 × .60 =</text>
+          <text x="210" y="109" text-anchor="end" font-family="JetBrains Mono,monospace" font-size="13" fill="#ffb547" font-weight="600">0.12</text>
+
+          <line x1="18" y1="125" x2="210" y2="125" stroke="#2a3045" stroke-width="1"/>
+
+          <text x="18" y="148" font-family="JetBrains Mono,monospace" font-size="13" fill="#7a8195">sum =</text>
+          <text x="210" y="148" text-anchor="end" font-family="JetBrains Mono,monospace" font-size="14" fill="#5fb3ff" font-weight="600">0.97</text>
+
+          <rect x="18" y="170" width="192" height="74" rx="6" fill="#1c2030" stroke="#5fffa0" stroke-width="1.5"/>
+          <text x="114" y="190" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="9" fill="#5fffa0" letter-spacing="2">SCORE FOR "3"</text>
+          <text x="114" y="218" text-anchor="middle" font-family="Fraunces,serif" font-size="22" fill="#5fffa0" font-weight="700">0.97</text>
+          <text x="114" y="236" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="8" fill="#7a8195">(highest of 10 → WINNER)</text>
+        </g>
+
+        <!-- Arrow -->
+        <g transform="translate(450, 200)">
+          <line x1="0" y1="0" x2="22" y2="0" stroke="#5fb3ff" stroke-width="2"/>
+          <polygon points="22,-5 30,0 22,5" fill="#5fb3ff"/>
+        </g>
+      </svg>
+    </div>
+    <div class="formula">output<sub>"3"</sub> = <b>w₁</b>·h₁ + <b>w₂</b>·h₂ + <b>w₃</b>·h₃  ·  the digit with the biggest score wins</div>
+  </div>
+
+  <div class="step" data-step="8">
+    <h2 class="step-title">Before training: the network is just guessing</h2>
+    <p class="step-desc">Fresh out of the box, every weight is <em>random</em>. The pixels still flow through, the math still runs — but the hidden layer isn't detecting anything meaningful yet, so the output is basically noise. Here the network looks at a "3" and confidently blurts out <em>"9"</em>. Wrong, but that's the whole point: it hasn't learned yet.</p>
+    <div class="canvas-wrap">
+      <svg viewBox="0 0 800 460">
+        <g id="fullConnIHa"></g>
+        <g id="fullConnHOa"></g>
+        <g id="fullPixelsa"></g>
+        <g id="fullInputa"></g>
+        <g id="fullHiddena"></g>
+        <g id="fullOutputa"></g>
+        <text x="180" y="445" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="11" fill="#7a8195">INPUT (64)</text>
+        <text x="430" y="445" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="11" fill="#7a8195">HIDDEN (16)</text>
+        <text x="680" y="445" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="11" fill="#7a8195">OUTPUT (10)</text>
+      </svg>
+    </div>
+    <div class="legend">
+      <span><span class="swatch" style="background:#5fb3ff"></span>positive weight</span>
+      <span><span class="swatch" style="background:#ff5b6e"></span>negative weight</span>
+      <span><span class="swatch" style="background:#ff5b6e"></span>wrong answer</span>
+    </div>
+  </div>
+
+  <div class="step" data-step="10">
+    <h2 class="step-title">After training: the same network, now correct</h2>
+    <p class="step-desc">Same architecture, same pixels, same forward pass — but now every weight has been nudged thousands of times toward getting things right. The hidden layer is tuned to pick up the curves and edges of real digits, and the output for <em>"3"</em> lights up the strongest. This is one full <em>forward pass</em>, post-training.</p>
+    <div class="canvas-wrap">
+      <svg viewBox="0 0 800 460">
+        <g id="fullConnIH"></g>
+        <g id="fullConnHO"></g>
+        <g id="fullPixels"></g>
+        <g id="fullInput"></g>
+        <g id="fullHidden"></g>
+        <g id="fullOutput"></g>
+        <text x="180" y="445" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="11" fill="#7a8195">INPUT (64)</text>
+        <text x="430" y="445" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="11" fill="#7a8195">HIDDEN (16)</text>
+        <text x="680" y="445" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="11" fill="#7a8195">OUTPUT (10)</text>
+      </svg>
+    </div>
+    <div class="legend">
+      <span><span class="swatch" style="background:#5fb3ff"></span>positive weight</span>
+      <span><span class="swatch" style="background:#ff5b6e"></span>negative weight</span>
+      <span><span class="swatch" style="background:#ffb547"></span>correct answer</span>
+    </div>
+  </div>
+
+  <div class="step" data-step="7">
+    <h2 class="step-title">Each weight is a knob you can dial</h2>
+    <p class="step-desc">Imagine just <em>one</em> hidden neuron with 4 inputs. Each connection has a weight — turn the knob up to amplify that input, down to suppress it (or even invert it). The neuron sums the dialed-up signals and fires through ReLU. <em>Drag the knobs up or down</em> to see how the output changes.</p>
+    <div class="canvas-wrap" style="flex-direction:column;align-items:stretch;padding:20px">
+      <svg viewBox="0 0 700 240" style="margin-bottom:10px">
+        <g id="knobNetwork"></g>
+      </svg>
+      <div class="knob-panel" id="knobPanel"></div>
+      <div class="knob-hint">↑ drag up to increase  ·  ↓ drag down to decrease</div>
+      <div class="knob-output" id="knobOutput"></div>
+    </div>
+    <div class="formula">h = ReLU( <b>w₁</b>·x₁ + <b>w₂</b>·x₂ + <b>w₃</b>·x₃ + <b>w₄</b>·x₄ )</div>
+  </div>
+
+  <div class="step" data-step="9">
+    <h2 class="step-title">Training: tweak the knobs until it gets things right</h2>
+    <p class="step-desc">We start with random weights — the network's guesses are nonsense. We show it labeled examples ("this image is a 3"), measure how wrong it was (the <em>loss</em>), and nudge every weight a tiny bit in the direction that reduces the error. Repeat thousands of times. Hit <em>auto-train</em> to watch.</p>
+    <div class="canvas-wrap" style="flex-direction:column;align-items:stretch;padding:20px">
+      <div class="train-controls">
+        <button id="trainStep">▶ TRAIN ONE STEP</button>
+        <button id="trainRun" class="ghost">▶▶ AUTO-TRAIN</button>
+        <button id="trainReset" class="ghost">⟲ RESET</button>
+        <span class="train-stats">EPOCH: <b id="epoch">0</b> · ACCURACY: <b id="accuracy">10%</b> · LOSS: <b id="loss">2.30</b></span>
+      </div>
+      <svg viewBox="0 0 800 360">
+        <g id="trainExamples"></g>
+        <g id="trainNetwork"></g>
+        <g id="lossCurve"></g>
+      </svg>
+    </div>
+    <div class="formula">loss = how_wrong( prediction, true_label )  →  adjust every weight a tiny bit to reduce loss</div>
+  </div>
+
+  <div class="step" data-step="11">
+    <h2 class="step-title">The secret sauce is just numbers</h2>
+    <p class="step-desc">There's no magic inside a trained neural network — just <em>weights</em>, saved as giant tables of floating-point numbers. The architecture is a recipe; the weights are the actual knowledge. Copy those numbers to another machine and you've copied the entire trained model.</p>
+    <div class="canvas-wrap" style="flex-direction:column;align-items:stretch;padding:22px 20px">
+      <div class="tensor-grid">
+        <div class="tensor-card">
+          <div class="tensor-label">W₁ · input → hidden  ·  <span>64 × 16 = 1,024 weights</span></div>
+          <pre class="tensor-body" id="tensorW1"></pre>
+        </div>
+        <div class="tensor-card">
+          <div class="tensor-label">W₂ · hidden → output  ·  <span>16 × 10 = 160 weights</span></div>
+          <pre class="tensor-body" id="tensorW2"></pre>
+        </div>
+      </div>
+
+      <div class="scale-panel">
+        <div class="scale-header">Same idea, wildly different scale</div>
+        <div class="scale-rows">
+          <div class="scale-row"><span class="scale-name">This demo</span><span class="scale-bar"><span style="width:.01%"></span></span><span class="scale-count">~1,200</span></div>
+          <div class="scale-row"><span class="scale-name">Small image classifier (ResNet-50)</span><span class="scale-bar"><span style="width:.5%"></span></span><span class="scale-count">25 million</span></div>
+          <div class="scale-row"><span class="scale-name">GPT-2</span><span class="scale-bar"><span style="width:3%"></span></span><span class="scale-count">1.5 billion</span></div>
+          <div class="scale-row"><span class="scale-name">LLaMA 70B</span><span class="scale-bar"><span style="width:14%"></span></span><span class="scale-count">70 billion</span></div>
+          <div class="scale-row"><span class="scale-name">GPT-4-class frontier model</span><span class="scale-bar"><span style="width:100%"></span></span><span class="scale-count">~1–2 trillion</span></div>
+        </div>
+        <div class="scale-footnote">Every one of those parameters is a single float — learned during training, frozen at inference. A trillion-parameter model is, at the end of the day, a trillion numbers in a file.</div>
+      </div>
+    </div>
+    <div class="formula">model = { architecture (code) + weights (numbers) }  ·  the weights <b>are</b> the learning</div>
+  </div>
+
+  <div class="controls">
+    <button id="prev">← PREV</button>
+    <span class="counter" id="counter">STEP 01 / 11</span>
+    <button id="next">NEXT →</button>
+  </div>
+</div>
+
+<script>
+const digit3 = [
+  [0,  0.3,  1,  1,  1,  1,  0.4, 0  ],
+  [0,  1,    0.5,0,  0,  0.2,1,   0.3],
+  [0,  0.2,  0,  0,  0,  0,  1,   0  ],
+  [0,  0,    0,  0.7,1,  1,  0.6, 0  ],
+  [0,  0,    0,  0,  0,  0.3,1,   0  ],
+  [0,  0,    0,  0,  0,  0,  1,   0.2],
+  [0,  1,    0.4,0,  0,  0.3,1,   0  ],
+  [0,  0.3,  1,  1,  1,  0.8,0.2, 0  ]
+];
+
+// STEP 1
+const pg = document.getElementById('pixelGrid');
+const cell = 32, ox = 30, oy = 50;
+// Map brightness (0 to 1) to grey color
+function brightnessToFill(v) {
+  if (v === 0) return '#1c2030';
+  // Interpolate between dark bg and white based on brightness
+  const base = 28;  // dark bg
+  const lit = 244; // bright
+  const c = Math.round(base + v * (lit - base));
+  return `rgb(${c},${c},${c+6})`;
+}
+digit3.forEach((row, r) => row.forEach((v, c) => {
+  pg.innerHTML += `<rect x="${ox+c*cell}" y="${oy+r*cell}" width="${cell-2}" height="${cell-2}" rx="2" fill="${brightnessToFill(v)}" stroke="#2a3045" stroke-width="1"/>`;
+}));
+const nm = document.getElementById('numMatrix');
+digit3.forEach((row, r) => row.forEach((v, c) => {
+  // Color intensity scales with brightness
+  let color = '#3a4258';
+  if (v >= 0.7) color = '#ffb547';
+  else if (v >= 0.3) color = '#c98a2e';
+  else if (v > 0) color = '#6b5a3a';
+  nm.innerHTML += `<text x="${c*30}" y="${r*32}" font-family="JetBrains Mono,monospace" font-size="11" fill="${color}">${v.toFixed(1)}</text>`;
+}));
+
+// STEP 2
+const pg2 = document.getElementById('pixelGrid2');
+const cell2 = 18, ox2 = 50, oy2 = 110;
+digit3.forEach((row, r) => row.forEach((v, c) => {
+  pg2.innerHTML += `<rect x="${ox2+c*cell2}" y="${oy2+r*cell2}" width="${cell2-1}" height="${cell2-1}" rx="1" fill="${brightnessToFill(v)}" stroke="#2a3045" stroke-width=".5"/>`;
+}));
+const inputNeurons = document.getElementById('inputNeurons');
+const lines = document.getElementById('inputLines');
+const neuronX = 500;
+const positions = [50,95,140,175,205,240,285,330];
+const labels2 = ['x₁','x₂','x₃','...','...','x₆₂','x₆₃','x₆₄'];
+const flatPixels = digit3.flat();
+const sampleVals = [flatPixels[0],flatPixels[1],flatPixels[2],null,null,flatPixels[61],flatPixels[62],flatPixels[63]];
+positions.forEach((y,i) => {
+  if (labels2[i] === '...') {
+    inputNeurons.innerHTML += `<text x="${neuronX}" y="${y+5}" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="14" fill="#7a8195">⋮</text>`;
+  } else {
+    const val = sampleVals[i];
+    inputNeurons.innerHTML += `
+      <circle cx="${neuronX}" cy="${y}" r="14" fill="${val>0.5?'#ffb547':'#1c2030'}" stroke="${val>0.5?'#ffb547':'#3a4258'}" stroke-width="1.5"/>
+      <text x="${neuronX-30}" y="${y+4}" text-anchor="end" font-family="JetBrains Mono,monospace" font-size="11" fill="#7a8195">${labels2[i]}</text>
+      <text x="${neuronX+30}" y="${y+4}" font-family="JetBrains Mono,monospace" font-size="10" fill="${val>0.5?'#ffb547':'#3a4258'}">${val.toFixed(1)}</text>`;
+    const gridY = oy2+(i<4?i:8-(8-i))*cell2+cell2/2;
+    lines.innerHTML += `<line x1="${ox2+8*cell2+5}" y1="${gridY}" x2="${neuronX-15}" y2="${y}" stroke="#2a3045" stroke-width="1"/>`;
+  }
+});
+
+// STEP 3 and STEP 4 are now hardcoded inline SVG with worked-math examples
+// (no dynamic JS needed for those steps)
+
+// STEP 2: LAYOUT (neutral anatomy view, no activations)
+const layoutInput = document.getElementById('layoutInput');
+const layoutHidden = document.getElementById('layoutHidden');
+const layoutOutput = document.getElementById('layoutOutput');
+const layoutConnIH = document.getElementById('layoutConnIH');
+const layoutConnHO = document.getElementById('layoutConnHO');
+
+const layInX = 180, layHidX = 430, layOutX = 680;
+const layInputYs = [];
+for (let i=0;i<10;i++) layInputYs.push(60+i*36);
+const layInputLabels = ['x₁','x₂','x₃','x₄','⋮','⋮','x₆₁','x₆₂','x₆₃','x₆₄'];
+const layHiddenYs = [];
+for (let i=0;i<8;i++) layHiddenYs.push(80+i*40);
+const layOutputYs = [];
+for (let i=0;i<10;i++) layOutputYs.push(60+i*36);
+
+// All connections neutral grey — no weights shown yet
+layInputYs.forEach((iy,i) => {
+  if (layInputLabels[i]==='⋮') return;
+  layHiddenYs.forEach(hy => {
+    layoutConnIH.innerHTML += `<line x1="${layInX+12}" y1="${iy}" x2="${layHidX-12}" y2="${hy}" stroke="#3a4258" stroke-width=".5" opacity=".45"/>`;
+  });
+});
+layHiddenYs.forEach(hy => layOutputYs.forEach(oy => {
+  layoutConnHO.innerHTML += `<line x1="${layHidX+12}" y1="${hy}" x2="${layOutX-12}" y2="${oy}" stroke="#3a4258" stroke-width=".5" opacity=".45"/>`;
+}));
+
+// All neurons neutral — no highlights, no "winner"
+layInputYs.forEach((y,i) => {
+  if (layInputLabels[i]==='⋮') {
+    layoutInput.innerHTML += `<text x="${layInX}" y="${y+4}" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="14" fill="#7a8195">⋮</text>`;
+  } else {
+    layoutInput.innerHTML += `<circle cx="${layInX}" cy="${y}" r="11" fill="#1c2030" stroke="#5fb3ff" stroke-width="1.5"/><text x="${layInX-18}" y="${y+3}" text-anchor="end" font-family="JetBrains Mono,monospace" font-size="9" fill="#7a8195">${layInputLabels[i]}</text>`;
+  }
+});
+layHiddenYs.forEach((y,i) => {
+  layoutHidden.innerHTML += `<circle cx="${layHidX}" cy="${y}" r="12" fill="#1c2030" stroke="#5fb3ff" stroke-width="1.5"/><text x="${layHidX}" y="${y+3}" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="9" fill="#7a8195">h${i+1}</text>`;
+});
+layOutputYs.forEach((y,k) => {
+  layoutOutput.innerHTML += `<circle cx="${layOutX}" cy="${y}" r="11" fill="#1c2030" stroke="#5fb3ff" stroke-width="1.5"/><text x="${layOutX}" y="${y+3}" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="9" fill="#7a8195">${k}</text>`;
+});
+
+// STEPS 7 & 8: FULL NETWORK (untrained picks 9 wrong, trained picks 3 correct)
+function renderFullNetwork(suffix, winIndex, opts) {
+  const fullPixels = document.getElementById('fullPixels'+suffix);
+  const fullInput = document.getElementById('fullInput'+suffix);
+  const fullHidden = document.getElementById('fullHidden'+suffix);
+  const fullOutput = document.getElementById('fullOutput'+suffix);
+  const fullConnIH = document.getElementById('fullConnIH'+suffix);
+  const fullConnHO = document.getElementById('fullConnHO'+suffix);
+
+  const pxC = 8, pxOX = 30, pxOY = 30;
+  digit3.forEach((row,r) => row.forEach((v,c) => {
+    fullPixels.innerHTML += `<rect x="${pxOX+c*pxC}" y="${pxOY+r*pxC}" width="${pxC-1}" height="${pxC-1}" fill="${brightnessToFill(v)}"/>`;
+  }));
+  fullPixels.innerHTML += `<text x="62" y="115" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="9" fill="#7a8195">"3"</text>`;
+  fullPixels.innerHTML += `<text x="62" y="130" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="8" fill="#5fb3ff">→ 64 pixels</text>`;
+
+  const fullInX = 180, fullHidX = 430, fullOutX = 680;
+  const fullInputYs = [];
+  for (let i=0;i<10;i++) fullInputYs.push(60+i*36);
+  const fullInputLabels = ['x₁','x₂','x₃','x₄','⋮','⋮','x₆₁','x₆₂','x₆₃','x₆₄'];
+  const fullInputActive = [false,true,true,true,null,null,true,false,true,true];
+  const fullHiddenYs = [];
+  for (let i=0;i<8;i++) fullHiddenYs.push(80+i*40);
+  // Untrained: hidden activations look noisy/random. Trained: meaningful pattern.
+  const fullHiddenActive = opts.trained
+    ? [false,true,false,true,false,false,true,false]
+    : [true,false,true,true,false,true,false,true];
+  const fullOutputYs = [];
+  for (let i=0;i<10;i++) fullOutputYs.push(60+i*36);
+
+  // Winner colors: trained = gold/correct, untrained = red/wrong
+  const winColor = opts.trained ? '#ffb547' : '#ff5b6e';
+  const winTextFill = opts.trained ? '#1a1408' : '#fff';
+
+  fullInputYs.forEach((iy,i) => {
+    if (fullInputLabels[i]==='⋮') return;
+    fullHiddenYs.forEach(hy => {
+      fullConnIH.innerHTML += `<line x1="${fullInX+12}" y1="${iy}" x2="${fullHidX-12}" y2="${hy}" stroke="${Math.random()>0.5?'#5fb3ff':'#ff5b6e'}" stroke-width=".5" opacity="${0.1+Math.random()*0.2}"/>`;
+    });
+  });
+  fullHiddenYs.forEach(hy => fullOutputYs.forEach((oy,k) => {
+    const isWin = k===winIndex;
+    fullConnHO.innerHTML += `<line x1="${fullHidX+12}" y1="${hy}" x2="${fullOutX-12}" y2="${oy}" stroke="${isWin?winColor:(Math.random()>0.5?'#5fb3ff':'#ff5b6e')}" stroke-width="${isWin?1:0.5}" opacity="${isWin?0.5:0.1+Math.random()*0.15}"/>`;
+  }));
+  fullInputYs.forEach((y,i) => {
+    if (fullInputLabels[i]==='⋮') {
+      fullInput.innerHTML += `<text x="${fullInX}" y="${y+4}" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="14" fill="#7a8195">⋮</text>`;
+    } else {
+      const active = fullInputActive[i];
+      fullInput.innerHTML += `<circle cx="${fullInX}" cy="${y}" r="11" fill="${active?'#ffb547':'#1c2030'}" stroke="${active?'#ffb547':'#5fb3ff'}" stroke-width="1.5"/><text x="${fullInX-18}" y="${y+3}" text-anchor="end" font-family="JetBrains Mono,monospace" font-size="9" fill="#7a8195">${fullInputLabels[i]}</text>`;
+    }
+  });
+  fullHiddenYs.forEach((y,i) => {
+    const active = fullHiddenActive[i];
+    fullHidden.innerHTML += `<circle cx="${fullHidX}" cy="${y}" r="12" fill="${active?'#ffb547':'#1c2030'}" stroke="${active?'#ffb547':'#3a4258'}" stroke-width="1.5"/><text x="${fullHidX}" y="${y+3}" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="9" fill="${active?'#1a1408':'#7a8195'}">h${i+1}</text>`;
+  });
+  fullOutputYs.forEach((y,k) => {
+    const isW = k===winIndex;
+    fullOutput.innerHTML += `<circle cx="${fullOutX}" cy="${y}" r="${isW?14:11}" fill="${isW?winColor:'#1c2030'}" stroke="${isW?winColor:'#3a4258'}" stroke-width="${isW?2:1.2}"/><text x="${fullOutX}" y="${y+3}" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="${isW?11:9}" fill="${isW?winTextFill:'#7a8195'}" font-weight="${isW?'600':'400'}">${k}</text>`;
+  });
+  fullOutput.innerHTML += `<text x="430" y="25" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="9" fill="#5fb3ff" letter-spacing="2">FORWARD PASS →</text><line x1="120" y1="35" x2="740" y2="35" stroke="#5fb3ff" stroke-width=".5" stroke-dasharray="3,3" opacity=".4"/>`;
+  // Prediction label
+  const label = opts.trained ? '← "3" ✓' : '← "9" ✗  (wrong — random weights)';
+  fullOutput.innerHTML += `<text x="${fullOutX+30}" y="${fullOutputYs[winIndex]+4}" font-family="JetBrains Mono,monospace" font-size="11" fill="${winColor}" font-weight="600">${label}</text>`;
+}
+renderFullNetwork('a', 9, {trained:false});
+renderFullNetwork('', 3, {trained:true});
+
+// STEP 6: KNOBS
+const knobNet = document.getElementById('knobNetwork');
+const knobPanel = document.getElementById('knobPanel');
+const knobOutput = document.getElementById('knobOutput');
+const knobInputs = [0.8, 0.2, 0.9, 0.5];
+const knobInputNames = ['x₁','x₂','x₃','x₄'];
+let knobWeights = [0.5, -0.3, 0.7, 0.2];
+const knobBias = 0;
+
+function drawKnobNetwork() {
+  knobNet.innerHTML = '';
+  const inX = 100, hX = 500;
+  const yPos = [50, 95, 140, 185];
+  yPos.forEach((y,i) => {
+    const w = knobWeights[i];
+    const stroke = w >= 0 ? '#5fb3ff' : '#ff5b6e';
+    const width = Math.abs(w)*4 + 0.5;
+    const opacity = Math.min(1, Math.abs(w)*1.2 + 0.2);
+    knobNet.innerHTML += `<line x1="${inX+15}" y1="${y}" x2="${hX-18}" y2="120" stroke="${stroke}" stroke-width="${width}" opacity="${opacity}"/>`;
+    knobNet.innerHTML += `<text x="${(inX+hX)/2}" y="${(y+120)/2 - 4}" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="10" fill="${stroke}" font-weight="600">w${i+1}=${w.toFixed(2)}</text>`;
+  });
+  yPos.forEach((y,i) => {
+    const val = knobInputs[i];
+    knobNet.innerHTML += `<circle cx="${inX}" cy="${y}" r="14" fill="${val>0.5?'#ffb547':'#2a3045'}" stroke="${val>0.5?'#ffb547':'#5fb3ff'}" stroke-width="1.5"/><text x="${inX-22}" y="${y+4}" text-anchor="end" font-family="JetBrains Mono,monospace" font-size="11" fill="#7a8195">${knobInputNames[i]}=${val}</text>`;
+  });
+  const sum = knobWeights.reduce((a,w,i)=>a+w*knobInputs[i],0) + knobBias;
+  const h = Math.max(0, sum);
+  const active = h > 0.1;
+  knobNet.innerHTML += `<circle cx="${hX}" cy="120" r="22" fill="${active?'#ffb547':'#1c2030'}" stroke="${active?'#ffb547':'#3a4258'}" stroke-width="2"/><text x="${hX}" y="124" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="11" fill="${active?'#1a1408':'#7a8195'}" font-weight="600">h</text><text x="${hX+30}" y="124" font-family="JetBrains Mono,monospace" font-size="11" fill="#7a8195">= ${h.toFixed(2)}</text>`;
+}
+
+function buildKnobs() {
+  knobPanel.innerHTML = '';
+  knobWeights.forEach((w,i) => {
+    knobPanel.innerHTML += `<div class="knob"><div class="knob-label">WEIGHT w${i+1}</div><div class="knob-dial" data-idx="${i}" style="--angle:${w*135}deg"></div><div class="knob-value" id="kv${i}">${w.toFixed(2)}</div></div>`;
+  });
+  document.querySelectorAll('.knob-dial').forEach(dial => {
+    let dragging=false, startY=0, startW=0;
+    const idx = +dial.dataset.idx;
+    const start = (e) => { dragging=true; startY = e.touches?e.touches[0].clientY:e.clientY; startW = knobWeights[idx]; e.preventDefault(); };
+    const move = (e) => {
+      if (!dragging) return;
+      const y = e.touches?e.touches[0].clientY:e.clientY;
+      let newW = startW + (startY-y)*0.01;
+      newW = Math.max(-1, Math.min(1, newW));
+      knobWeights[idx] = newW;
+      dial.style.setProperty('--angle', (newW*135)+'deg');
+      document.getElementById('kv'+idx).textContent = newW.toFixed(2);
+      drawKnobNetwork();
+      updateKnobOutput();
+      e.preventDefault();
+    };
+    const end = () => { dragging=false; };
+    dial.addEventListener('mousedown', start);
+    dial.addEventListener('touchstart', start, {passive:false});
+    document.addEventListener('mousemove', move);
+    document.addEventListener('touchmove', move, {passive:false});
+    document.addEventListener('mouseup', end);
+    document.addEventListener('touchend', end);
+  });
+}
+
+function updateKnobOutput() {
+  const sum = knobWeights.reduce((a,w,i)=>a+w*knobInputs[i],0);
+  const h = Math.max(0, sum + knobBias);
+  knobOutput.innerHTML = `
+    <div class="item"><div class="item-label">Σ (w · x)</div><div class="item-val">${sum.toFixed(2)}</div></div>
+    <div class="item"><div class="item-label">→ ReLU</div><div class="item-val" style="color:${h>0.1?'#5fffa0':'#7a8195'}">${h.toFixed(2)}</div></div>
+    <div class="item"><div class="item-label">Status</div><div class="item-val" style="font-size:14px;color:${h>0.1?'#5fffa0':'#ff5b6e'}">${h>0.1?'FIRES ✓':'SILENT'}</div></div>
+  `;
+}
+
+drawKnobNetwork();
+buildKnobs();
+updateKnobOutput();
+
+// STEP 7: TRAINING
+const trainEx = document.getElementById('trainExamples');
+const trainNet = document.getElementById('trainNetwork');
+const lossCurve = document.getElementById('lossCurve');
+
+const examples = [
+  {label:'3', grid: digit3},
+  {label:'7', grid:[[0,1,1,1,1,1,1,0],[0,0,0,0,0,0,1,0],[0,0,0,0,0,1,0,0],[0,0,0,0,1,0,0,0],[0,0,0,1,0,0,0,0],[0,0,1,0,0,0,0,0],[0,0,1,0,0,0,0,0],[0,0,1,0,0,0,0,0]]},
+  {label:'0', grid:[[0,0,1,1,1,1,0,0],[0,1,0,0,0,0,1,0],[1,0,0,0,0,0,0,1],[1,0,0,0,0,0,0,1],[1,0,0,0,0,0,0,1],[1,0,0,0,0,0,0,1],[0,1,0,0,0,0,1,0],[0,0,1,1,1,1,0,0]]}
+];
+
+function drawTrainExamples() {
+  trainEx.innerHTML = '<text x="30" y="20" font-family="JetBrains Mono,monospace" font-size="10" fill="#7a8195" letter-spacing="2">LABELED EXAMPLES</text>';
+  examples.forEach((ex,i) => {
+    const xOff = 30 + i*100, yOff = 35, sz = 8;
+    ex.grid.forEach((row,r) => row.forEach((v,c) => {
+      trainEx.innerHTML += `<rect x="${xOff+c*sz}" y="${yOff+r*sz}" width="${sz-1}" height="${sz-1}" fill="${brightnessToFill(v)}"/>`;
+    }));
+    trainEx.innerHTML += `<rect x="${xOff-2}" y="${yOff-2}" width="${sz*8+3}" height="${sz*8+3}" fill="none" stroke="#2a3045" stroke-width="1"/><text x="${xOff+sz*4}" y="${yOff+sz*8+18}" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="11" fill="#5fb3ff">label: "${ex.label}"</text>`;
+  });
+  trainEx.innerHTML += '<text x="30" y="120" font-family="JetBrains Mono,monospace" font-size="9" fill="#7a8195">(thousands more...)</text>';
+}
+
+let epoch = 0;
+let lossHistory = [2.30];
+let weightStrength = 0;
+let autoTraining = null;
+
+function drawTrainNetwork() {
+  trainNet.innerHTML = '<text x="430" y="135" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="10" fill="#7a8195" letter-spacing="2">NETWORK (knobs being tuned)</text>';
+  const inX = 360, hX = 470, oX = 580;
+  const inYs = [165,190,215,240,265];
+  const hYs = [175,205,235,265];
+  const oYs = [165,190,215,240,265];
+  inYs.forEach((iy,i) => hYs.forEach((hy,j) => {
+    const seed = ((i*7+j*3) % 11) / 11;
+    const w = (seed - 0.5) * 2 * (0.2 + weightStrength*0.8);
+    const stroke = w >= 0 ? '#5fb3ff' : '#ff5b6e';
+    trainNet.innerHTML += `<line x1="${inX+8}" y1="${iy}" x2="${hX-8}" y2="${hy}" stroke="${stroke}" stroke-width="${0.4+Math.abs(w)*1.5}" opacity="${0.15+Math.abs(w)*0.5}"/>`;
+  }));
+  hYs.forEach((hy,j) => oYs.forEach((oy,k) => {
+    const seed = ((j*5+k*4) % 9) / 9;
+    const w = (seed - 0.5) * 2 * (0.2 + weightStrength*0.8);
+    const stroke = w >= 0 ? '#5fb3ff' : '#ff5b6e';
+    trainNet.innerHTML += `<line x1="${hX+8}" y1="${hy}" x2="${oX-8}" y2="${oy}" stroke="${stroke}" stroke-width="${0.4+Math.abs(w)*1.5}" opacity="${0.15+Math.abs(w)*0.5}"/>`;
+  }));
+  inYs.forEach(y => trainNet.innerHTML += `<circle cx="${inX}" cy="${y}" r="7" fill="#1c2030" stroke="#5fb3ff" stroke-width="1.2"/>`);
+  hYs.forEach(y => trainNet.innerHTML += `<circle cx="${hX}" cy="${y}" r="7" fill="#1c2030" stroke="#3a4258" stroke-width="1.2"/>`);
+  oYs.forEach((y,k) => {
+    const isW = weightStrength > 0.5 && k === 2;
+    trainNet.innerHTML += `<circle cx="${oX}" cy="${y}" r="${isW?9:7}" fill="${isW?'#ffb547':'#1c2030'}" stroke="${isW?'#ffb547':'#3a4258'}" stroke-width="${isW?2:1.2}"/>`;
+  });
+  if (epoch > 0) {
+    trainNet.innerHTML += `<text x="${(inX+hX)/2}" y="155" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="9" fill="#ffb547">⟳</text><text x="${(hX+oX)/2}" y="155" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="9" fill="#ffb547">⟳</text>`;
+  }
+  trainNet.innerHTML += `<text x="470" y="305" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="9" fill="${epoch>0?'#ff5b6e':'#3a4258'}" letter-spacing="2">← BACKPROP nudges every weight</text>`;
+}
+
+function drawLossCurve() {
+  const xOff = 30, yOff = 175, w = 280, h = 130;
+  lossCurve.innerHTML = `<text x="30" y="165" font-family="JetBrains Mono,monospace" font-size="10" fill="#7a8195" letter-spacing="2">LOSS OVER TIME</text><line x1="${xOff}" y1="${yOff+h}" x2="${xOff+w}" y2="${yOff+h}" stroke="#3a4258" stroke-width="1"/><line x1="${xOff}" y1="${yOff}" x2="${xOff}" y2="${yOff+h}" stroke="#3a4258" stroke-width="1"/><text x="${xOff-5}" y="${yOff+8}" text-anchor="end" font-family="JetBrains Mono,monospace" font-size="9" fill="#7a8195">2.5</text><text x="${xOff-5}" y="${yOff+h+3}" text-anchor="end" font-family="JetBrains Mono,monospace" font-size="9" fill="#7a8195">0</text><text x="${xOff+w/2}" y="${yOff+h+18}" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="9" fill="#7a8195">epoch →</text>`;
+  if (lossHistory.length < 2) return;
+  const maxL = 2.5, maxE = Math.max(20, lossHistory.length);
+  let path = '';
+  lossHistory.forEach((l,i) => {
+    const px = xOff + (i/maxE)*w;
+    const py = yOff + (1 - l/maxL)*h;
+    path += (i===0?'M':'L') + px + ',' + py + ' ';
+  });
+  lossCurve.innerHTML += `<path d="${path}" fill="none" stroke="#ffb547" stroke-width="2"/>`;
+  const last = lossHistory[lossHistory.length-1];
+  const lpx = xOff + ((lossHistory.length-1)/maxE)*w;
+  const lpy = yOff + (1 - last/maxL)*h;
+  lossCurve.innerHTML += `<circle cx="${lpx}" cy="${lpy}" r="3" fill="#ffb547"/>`;
+}
+
+function updateTrainStats() {
+  document.getElementById('epoch').textContent = epoch;
+  const loss = 2.30 * Math.exp(-epoch * 0.15) + 0.05;
+  document.getElementById('loss').textContent = loss.toFixed(2);
+  const acc = Math.min(98, 10 + (1 - Math.exp(-epoch * 0.12)) * 88);
+  document.getElementById('accuracy').textContent = Math.round(acc) + '%';
+  weightStrength = Math.min(1, epoch/20);
+}
+
+function trainOneStep() {
+  epoch++;
+  const loss = 2.30 * Math.exp(-epoch*0.15) + 0.05;
+  lossHistory.push(loss);
+  if (lossHistory.length > 30) lossHistory.shift();
+  updateTrainStats();
+  drawTrainNetwork();
+  drawLossCurve();
+}
+
+function resetTraining() {
+  epoch = 0;
+  lossHistory = [2.30];
+  weightStrength = 0;
+  if (autoTraining) { clearInterval(autoTraining); autoTraining = null; document.getElementById('trainRun').textContent = '▶▶ AUTO-TRAIN'; }
+  updateTrainStats();
+  drawTrainNetwork();
+  drawLossCurve();
+}
+
+drawTrainExamples();
+drawTrainNetwork();
+drawLossCurve();
+updateTrainStats();
+
+document.getElementById('trainStep').addEventListener('click', trainOneStep);
+document.getElementById('trainReset').addEventListener('click', resetTraining);
+document.getElementById('trainRun').addEventListener('click', () => {
+  const btn = document.getElementById('trainRun');
+  if (autoTraining) {
+    clearInterval(autoTraining);
+    autoTraining = null;
+    btn.textContent = '▶▶ AUTO-TRAIN';
+  } else {
+    btn.textContent = '⏸ PAUSE';
+    autoTraining = setInterval(() => {
+      trainOneStep();
+      if (epoch >= 30) {
+        clearInterval(autoTraining);
+        autoTraining = null;
+        btn.textContent = '▶▶ AUTO-TRAIN';
+      }
+    }, 250);
+  }
+});
+
+// STEP 11: THE SECRET SAUCE — render tensors as styled number tables
+function fmtFloat(n) {
+  const s = n.toFixed(2);
+  const cls = n < 0 ? 'neg' : 'pos';
+  // +0.12 / -0.34 style, pad to fixed width for grid alignment
+  const sign = n < 0 ? '-' : ' ';
+  return `<span class="${cls}">${sign}${Math.abs(n).toFixed(2)}</span>`;
+}
+function randomTensor(rows, cols, seedOffset) {
+  // Use a deterministic-ish PRNG so the display is stable across reloads
+  let x = 12345 + seedOffset;
+  const rnd = () => { x = (x * 9301 + 49297) % 233280; return x / 233280; };
+  const lines = [];
+  for (let r = 0; r < rows; r++) {
+    const row = [];
+    for (let c = 0; c < cols; c++) {
+      row.push(fmtFloat((rnd() - 0.5) * 1.6));
+    }
+    lines.push('[ ' + row.join('  ') + ' ]');
+  }
+  return lines.join('\n');
+}
+const tW1 = document.getElementById('tensorW1');
+const tW2 = document.getElementById('tensorW2');
+if (tW1) tW1.innerHTML = randomTensor(8, 6, 1) + '\n   ⋮       ⋮       ⋮       ⋮       ⋮       ⋮\n(64 rows × 16 cols)';
+if (tW2) tW2.innerHTML = randomTensor(8, 6, 73) + '\n   ⋮       ⋮       ⋮       ⋮       ⋮       ⋮\n(16 rows × 10 cols)';
+
+// Navigation
+const steps = document.querySelectorAll('.step');
+const stepBtns = document.querySelectorAll('#stepBar button');
+const counter = document.getElementById('counter');
+let current = 1;
+const TOTAL = 11;
+function goto(n) {
+  current = Math.max(1, Math.min(TOTAL, n));
+  steps.forEach(s => s.classList.toggle('active', +s.dataset.step === current));
+  stepBtns.forEach(b => b.classList.toggle('active', +b.dataset.step === current));
+  counter.textContent = `STEP ${String(current).padStart(2,'0')} / ${String(TOTAL).padStart(2,'0')}`;
+  document.getElementById('prev').disabled = current === 1;
+  document.getElementById('next').disabled = current === TOTAL;
+}
+stepBtns.forEach(b => b.addEventListener('click', () => goto(+b.dataset.step)));
+document.getElementById('prev').addEventListener('click', () => goto(current-1));
+document.getElementById('next').addEventListener('click', () => goto(current+1));
+goto(1);
+</script>
+</body>
+</html>
