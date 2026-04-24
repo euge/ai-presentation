@@ -37,6 +37,9 @@
   .step-title{font-size:20px;font-weight:600;margin:0 0 6px;letter-spacing:-.01em}
   .step-desc{color:var(--muted);margin:0 0 18px;font-size:14px;line-height:1.55;max-width:760px}
   .step-desc em{color:var(--accent);font-style:italic}
+  ul.step-desc{padding-left:20px}
+  ul.step-desc li{margin-bottom:4px}
+  ul.step-desc li::marker{color:#3a4258}
   .canvas-wrap{background:#0b0d12;border-radius:12px;border:1px solid #1d2130;padding:16px;display:flex;justify-content:center;align-items:center;min-height:380px;overflow-x:auto}
   svg{max-width:100%;height:auto;display:block}
   .legend{display:flex;gap:16px;flex-wrap:wrap;margin-top:14px;font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--muted);letter-spacing:.05em}
@@ -135,7 +138,11 @@
 
   <div class="step active" data-step="1">
     <h2 class="step-title">A computer has to read this <em>3</em></h2>
-    <p class="step-desc">Banks read handwritten checks. The post office sorts mail by ZIP code. Your school scans thousands of bubble-test answers. Every day, computers turn a messy smear of ink into the right digit. <em>How?</em> By the end of these slides you'll know — and you'll see the math is simpler than it looks.</p>
+    <ul class="step-desc">
+      <li>Banks read checks, the post office sorts ZIP codes, schools scan bubble tests.</li>
+      <li>Every day, computers turn a messy smear of ink into the right digit.</li>
+      <li>By the end of these slides, you'll see the math is simpler than it looks.</li>
+    </ul>
     <div class="canvas-wrap">
       <svg viewBox="0 0 800 380">
         <g id="hookDigits"></g>
@@ -156,7 +163,11 @@
 
   <div class="step" data-step="4">
     <h2 class="step-title">Neural network</h2>
-    <p class="step-desc">A stack of simple math steps that turns inputs into an answer — and gets better at it by seeing examples. The whole thing is just dots (neurons) wired together by lines (weights), arranged in columns (layers).</p>
+    <ul class="step-desc">
+      <li>A stack of simple math steps that turns inputs into an answer.</li>
+      <li>Just dots (<em>neurons</em>) wired by lines (<em>weights</em>), in columns (<em>layers</em>).</li>
+      <li>It gets better by seeing examples.</li>
+    </ul>
     <div class="canvas-wrap">
       <svg viewBox="0 0 800 460" class="def-svg"><g class="def-diagram" data-mode="network"></g></svg>
     </div>
@@ -164,7 +175,11 @@
 
   <div class="step" data-step="5">
     <h2 class="step-title">Layer</h2>
-    <p class="step-desc">A column of neurons that all do their work at the same time before passing results to the next column. Data flows left → right.</p>
+    <ul class="step-desc">
+      <li>A column of neurons that all work at the same time.</li>
+      <li>Each layer passes its results to the next one.</li>
+      <li>Data flows left → right.</li>
+    </ul>
     <div class="canvas-wrap">
       <svg viewBox="0 0 800 460" class="def-svg"><g class="def-diagram" data-mode="layer"></g></svg>
     </div>
@@ -172,7 +187,11 @@
 
   <div class="step" data-step="6">
     <h2 class="step-title">Neuron</h2>
-    <p class="step-desc">A single unit that holds one number — how "lit up" it is based on what feeds into it. Think of it as a lightbulb that can be anywhere from off (0) to fully bright (1).</p>
+    <ul class="step-desc">
+      <li>A single unit that holds one number.</li>
+      <li>That number is how "lit up" it is, based on what feeds in.</li>
+      <li>Think of it as a dimmable lightbulb — off (0) to fully bright (1).</li>
+    </ul>
     <div class="canvas-wrap">
       <svg viewBox="0 0 800 460" class="def-svg"><g class="def-diagram" data-mode="neuron"></g></svg>
     </div>
@@ -180,7 +199,12 @@
 
   <div class="step" data-step="7">
     <h2 class="step-title">Weight</h2>
-    <p class="step-desc">A single connection between two neurons with a strength dial. Turn it up: that input has a louder say. Turn it down (or negative): it's suppressed or inverted. Training is the process of nudging every one of these dials.</p>
+    <ul class="step-desc">
+      <li>A connection between two neurons with a strength dial.</li>
+      <li>Turn it up: that input has a louder say.</li>
+      <li>Turn it down (or negative): it's suppressed or inverted.</li>
+      <li>Training is just nudging every one of these dials.</li>
+    </ul>
     <div class="canvas-wrap">
       <svg viewBox="0 0 800 460" class="def-svg"><g class="def-diagram" data-mode="weight"></g></svg>
     </div>
@@ -188,7 +212,12 @@
 
   <div class="step" data-step="14">
     <h2 class="step-title">"Neurons that fire together, wire together"</h2>
-    <p class="step-desc">Connections on paths that consistently help the network get the right answer grow stronger; unhelpful ones fade. This is the intuition behind training — you'll see it happen in the next slide. <em>(Caveat for the curious: real networks learn via "backpropagation," a different mechanism. But this mental model gets you 90% of the way.)</em></p>
+    <ul class="step-desc">
+      <li>Paths that help the network get the right answer grow stronger.</li>
+      <li>Unhelpful paths fade.</li>
+      <li>That's the intuition behind training — you'll see it next slide.</li>
+      <li><em>(Real networks use "backpropagation" — but this model gets you 90% there.)</em></li>
+    </ul>
     <div class="canvas-wrap">
       <svg viewBox="0 0 800 460" class="def-svg"><g class="def-diagram" data-mode="fire"></g></svg>
     </div>
@@ -196,7 +225,12 @@
 
   <div class="step" data-step="2">
     <h2 class="step-title">The image is just a grid of numbers</h2>
-    <p class="step-desc">A handwritten "3" is captured as a small grid of pixels. Each pixel has a brightness value between 0 (black) and 1 (white). The network never sees the picture — only these numbers. Our whole job is to turn these 64 numbers into one answer: "it's a 3."</p>
+    <ul class="step-desc">
+      <li>A handwritten "3" is captured as a small grid of pixels.</li>
+      <li>Each pixel has a brightness value between 0 (black) and 1 (white).</li>
+      <li>The network never sees the picture — only these numbers.</li>
+      <li>The job: turn 64 numbers into one answer — <em>"it's a 3."</em></li>
+    </ul>
     <div class="canvas-wrap">
       <svg viewBox="0 0 700 380">
         <g id="pixelGrid"></g>
@@ -219,7 +253,12 @@
 
   <div class="step" data-step="3">
     <h2 class="step-title">The whole machine, at a glance</h2>
-    <p class="step-desc">Here's the full layout — three columns of neurons (circles) connected by weights (lines). The left column holds the 64 pixels, the right column has one neuron per digit (0–9). The middle is where the work happens. Don't worry about the details yet — we'll unpack each piece.</p>
+    <ul class="step-desc">
+      <li>Three columns of neurons (circles) connected by weights (lines).</li>
+      <li>Left: 64 pixels. Right: one neuron per digit (0–9).</li>
+      <li>The middle is where the work happens.</li>
+      <li>Don't worry about the details — we'll unpack each piece.</li>
+    </ul>
     <div class="canvas-wrap">
       <svg viewBox="0 0 800 460">
         <g id="layoutConnIH"></g>
@@ -242,7 +281,12 @@
 
   <div class="step" data-step="10">
     <h2 class="step-title">Each pixel becomes an input neuron</h2>
-    <p class="step-desc">The flattened list of 64 brightness values is fed into 64 input neurons. Each input neuron simply holds one pixel's value. Think of this layer as the eyes of the network. <em>(The subscript "x₁" just means "the first input" — nothing fancy.)</em></p>
+    <ul class="step-desc">
+      <li>The 64 brightness values feed into 64 input neurons.</li>
+      <li>Each input neuron just holds one pixel's value.</li>
+      <li>Think of this layer as the eyes of the network.</li>
+      <li><em>(x₁ just means "the first input" — nothing fancy.)</em></li>
+    </ul>
     <div class="canvas-wrap">
       <svg viewBox="0 0 700 380">
         <g id="pixelGrid2"></g>
@@ -257,7 +301,12 @@
 
   <div class="step" data-step="11">
     <h2 class="step-title">Hidden neurons: multiply, add, gate</h2>
-    <p class="step-desc">Each connection has a <em>weight</em>. The hidden neuron does three things: <em>(1)</em> multiply each input by its weight, <em>(2)</em> add the results, <em>(3)</em> pass the total through a <em>gate</em> that keeps positives and zeroes out negatives. That's it. Here's one hidden neuron with 3 inputs, worked out (real neurons have 64 inputs — we're showing 3 for clarity):</p>
+    <ul class="step-desc">
+      <li>Each connection has a <em>weight</em>.</li>
+      <li>Multiply each input by its weight, then add the results.</li>
+      <li>Pass the total through a <em>gate</em> that keeps positives and zeroes out negatives.</li>
+      <li>Shown: one hidden neuron with 3 inputs (real ones have 64).</li>
+    </ul>
     <div class="canvas-wrap">
       <svg viewBox="0 0 720 380">
         <!-- Input neurons -->
@@ -343,7 +392,12 @@
 
   <div class="step" data-step="12">
     <h2 class="step-title">Output layer: same math, 10 times</h2>
-    <p class="step-desc">Each output neuron does the exact same thing: multiply every hidden value by its weight, sum them up. There are 10 output neurons — one for each digit 0 through 9. Whichever one ends up with the biggest score wins, and that's the network's guess. Here are 3 of 16 hidden neurons feeding into the output for digit "3".</p>
+    <ul class="step-desc">
+      <li>Each output neuron does the same math: multiply, sum.</li>
+      <li>10 output neurons — one per digit, 0 through 9.</li>
+      <li>Biggest score wins — that's the network's guess.</li>
+      <li>Shown: 3 of 16 hidden neurons feeding the output for "3".</li>
+    </ul>
     <div class="canvas-wrap">
       <svg viewBox="0 0 720 380">
         <!-- Hidden neurons (results from step 3) -->
@@ -428,7 +482,12 @@
 
   <div class="step" data-step="13">
     <h2 class="step-title">Before training: the network is just guessing</h2>
-    <p class="step-desc"><em>Same network, random weights.</em> Fresh out of the box, every weight is set to a random value. The pixels still flow through, the math still runs — but the hidden layer isn't detecting anything meaningful yet, so the output is basically noise. Here the network looks at a "3" and confidently blurts out <em>"9"</em>. Wrong, but that's the whole point: it hasn't learned yet. <em>(Remember this — we'll show the <strong>exact same network, same image</strong> after training.)</em></p>
+    <ul class="step-desc">
+      <li><em>Same network, random weights.</em> Fresh out of the box.</li>
+      <li>The math still runs, but the hidden layer detects nothing meaningful.</li>
+      <li>It looks at a "3" and confidently blurts out <em>"9"</em> — it hasn't learned yet.</li>
+      <li><em>(Remember this — same network, same image, after training.)</em></li>
+    </ul>
     <div class="canvas-wrap">
       <svg viewBox="0 0 800 460">
         <g id="fullConnIHa"></g>
@@ -451,7 +510,12 @@
 
   <div class="step" data-step="16">
     <h2 class="step-title">After training: the same network, now correct</h2>
-    <p class="step-desc"><em>Same network. Same image. Only the weights changed.</em> Every weight has been nudged thousands of times toward getting things right. The hidden layer is now tuned to pick up curves and edges, and the output for <em>"3"</em> lights up strongest. Compare this side-by-side with the previous slide — the circles and lines are identical. The <em>numbers</em> on the lines are what the network learned.</p>
+    <ul class="step-desc">
+      <li><em>Same network. Same image. Only the weights changed.</em></li>
+      <li>Every weight nudged thousands of times toward being right.</li>
+      <li>The hidden layer now picks up curves and edges; <em>"3"</em> lights up strongest.</li>
+      <li>The circles and lines are identical — the <em>numbers</em> on the lines are what it learned.</li>
+    </ul>
     <div class="canvas-wrap">
       <svg viewBox="0 0 800 460">
         <g id="fullConnIH"></g>
@@ -474,7 +538,12 @@
 
   <div class="step" data-step="8">
     <h2 class="step-title">Play with the knobs</h2>
-    <p class="step-desc">Enough definitions — here's a real weight you can touch. Imagine just <em>one</em> neuron with 4 inputs. Each connection has a weight dial: turn it up to amplify that input, down to suppress it, negative to invert it. Drag the dials and watch the output change. <em>Multiply that intuition by a million connections and you have a neural network.</em></p>
+    <ul class="step-desc">
+      <li>Enough definitions — here's a real weight you can touch.</li>
+      <li>One neuron, 4 inputs, one dial per connection.</li>
+      <li>Up = amplify, down = suppress, negative = invert.</li>
+      <li><em>Multiply that by a million connections and you have a neural network.</em></li>
+    </ul>
     <div class="canvas-wrap" style="flex-direction:column;align-items:stretch;padding:20px">
       <svg viewBox="0 0 700 240" style="margin-bottom:10px">
         <g id="knobNetwork"></g>
@@ -488,7 +557,12 @@
 
   <div class="step" data-step="9">
     <h2 class="step-title">Think lightbulbs and volume knobs</h2>
-    <p class="step-desc">Before we watch data flow through the network, hold two pictures in your head: every <em>neuron</em> is a lightbulb — it glows brighter when its inputs are bright. Every <em>weight</em> is a volume knob on one wire between two bulbs — turn it up and that input has a louder say, turn it negative and it pushes back. Training is just turning thousands of volume knobs until the right bulb lights up for each digit.</p>
+    <ul class="step-desc">
+      <li>Every <em>neuron</em> is a lightbulb — brighter when its inputs are bright.</li>
+      <li>Every <em>weight</em> is a volume knob on a wire between two bulbs.</li>
+      <li>Turn it up for a louder say; negative to push back.</li>
+      <li>Training just turns thousands of knobs until the right bulb lights up.</li>
+    </ul>
     <div class="canvas-wrap">
       <svg viewBox="0 0 800 380">
         <!-- Left: neuron = lightbulb analogy -->
@@ -593,7 +667,12 @@
 
   <div class="step" data-step="15">
     <h2 class="step-title">Training: tweak the knobs until it gets things right</h2>
-    <p class="step-desc">Show the network a labeled example ("this image is a <em>3</em>"). Measure how wrong its guess was — that number is called the <em>loss</em>. Then nudge every weight a tiny bit in the direction that would have reduced the loss. Repeat with thousands of examples. The "nudge" part has an engineering name (<em>backpropagation</em>), but it's just calculus telling each knob which way to turn.</p>
+    <ul class="step-desc">
+      <li>Show the network a labeled example ("this is a <em>3</em>").</li>
+      <li>Measure how wrong the guess was — that's the <em>loss</em>.</li>
+      <li>Nudge every weight a tiny bit in the direction that would reduce the loss.</li>
+      <li>Repeat thousands of times. (The engineering name is <em>backpropagation</em>.)</li>
+    </ul>
     <div class="canvas-wrap" style="flex-direction:column;align-items:stretch;padding:20px">
       <div class="train-controls">
         <button id="trainStep">▶ TRAIN ONE STEP</button>
@@ -622,7 +701,12 @@
 
   <div class="step" data-step="17">
     <h2 class="step-title">The secret sauce is just numbers in a file</h2>
-    <p class="step-desc">When you "download a model," <em>this is what's actually on disk</em>: weights, saved as giant tables of decimal numbers. The architecture is a recipe (a few hundred lines of code); the weights are the actual knowledge. Copy these numbers to another machine and you've copied the entire trained model. That's literally it — no hidden sauce.</p>
+    <ul class="step-desc">
+      <li>When you "download a model," <em>this is what's on disk</em>: weights, as giant tables of decimals.</li>
+      <li>The architecture is a recipe — a few hundred lines of code.</li>
+      <li>The weights are the actual knowledge.</li>
+      <li>Copy the numbers and you've copied the entire trained model.</li>
+    </ul>
     <div class="canvas-wrap" style="flex-direction:column;align-items:stretch;padding:22px 20px">
       <div class="tensor-grid">
         <div class="tensor-card">
@@ -652,7 +736,12 @@
 
   <div class="step" data-step="18">
     <h2 class="step-title">That's the whole idea</h2>
-    <p class="step-desc">Strip away the jargon and a neural network is just: <em>numbers in → multiply and add → a number out</em>. Training finds the right numbers. The "AI" you've been hearing about — ChatGPT, Claude, image generators — is exactly this, scaled up by billions of weights. Same math, same training loop, same file-full-of-numbers. You now know how it works.</p>
+    <ul class="step-desc">
+      <li>A neural network is just: <em>numbers in → multiply and add → a number out</em>.</li>
+      <li>Training finds the right numbers.</li>
+      <li>ChatGPT, Claude, image generators — this, scaled to billions of weights.</li>
+      <li>Same math, same loop, same file-full-of-numbers.</li>
+    </ul>
     <div class="canvas-wrap">
       <svg viewBox="0 0 800 360">
         <!-- Three boxes -->
